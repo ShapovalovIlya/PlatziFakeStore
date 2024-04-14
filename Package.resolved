@@ -1,0 +1,15 @@
+{
+  "originHash" : "6083d7229f4ae7a8122b5f2c6fe013a0229bdb17e3d7c54b6e81674ce3e3d72a",
+  "pins" : [
+    {
+      "identity" : "swiftfp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ShapovalovIlya/SwiftFP.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c687aa58d62b9251a0c87d23b454d5d71f7064df"
+      }
+    }
+  ],
+  "version" : 3
+}
