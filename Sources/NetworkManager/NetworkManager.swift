@@ -12,28 +12,54 @@ public struct NetworkManager {
     public typealias Response = (data: Data, response: URLResponse)
     
     private let session: URLSession
+    private let saveResponse: (Response, URLRequest) -> Void
+    private let loadResponse: (URLRequest) -> Response?
+
     
-    init(session: URLSession = .shared) {
-        self.session = session
+    public init(_ dependencies: Dependencies = .configured) {
+        self.session = dependencies.session
+        self.saveResponse = dependencies.saveResponse
+        self.loadResponse = dependencies.loadResponse
     }
     
-    public init() {
-        let config = URLSessionConfiguration.default
-        self.init(session: URLSession(configuration: config))
+    public func perform(_ request: URLRequest) async -> Result<Response, Error> {
+        await loadCacheIfAvailable(request)
+            .mapRight(Result.success)
+            .asyncMap(loadData(for:))
+            .unwrap
+    }
+}
+
+private extension NetworkManager {
+    func loadCacheIfAvailable(_ request: URLRequest) -> Either<URLRequest, Response> {
+        Either { loadResponse(request).map(Either.right) ?? Either.left(request) }
     }
     
-    @discardableResult
-    public func request(_ request: URLRequest, completion: @escaping (Result<Response, Error>) -> Void) -> URLSessionDataTask {
-        let task = session.dataTask(with: request) { data, response, error in
-            error
-                .map(Result.failure)
-                .map(completion)
-            
-            data.merge(response)
-                .map(Result.success)
-                .map(completion)
+    func loadData(for request: URLRequest) async -> Result<Response, Error> {
+        await Result
+            .success(request)
+            .asyncMap(session.data)
+            .map(saveDataToCache(for: request))
+    }
+    
+    func saveDataToCache(for request: URLRequest) -> (Response) -> Response {
+        { response in
+            self.saveResponse(response, request)
+            return response
         }
-        task.resume()
-        return task
+    }
+}
+
+public extension NetworkManager {
+    struct Dependencies {
+        public var session: URLSession = .shared
+        public var saveResponse: (Response, URLRequest) -> Void = { _,_ in }
+        public var loadResponse: (URLRequest) -> Response? = { _ in nil }
+        
+        public static let configured = Self(
+            session: .shared,
+            saveResponse: NetworkCache.shared.save(_:for:),
+            loadResponse: NetworkCache.shared.loadResponse(for:)
+        )
     }
 }
