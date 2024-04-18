@@ -8,6 +8,14 @@
 import UIKit
 import SwiftFP
 
+/// Элемент интерфейса, для загрузки, кэширования и отображения изображений из интернета. Наследник `UIImageView`.
+///
+/// Экземпляр можно создавать и настраивать как обычный `UIImageView`.
+/// Для установки изображения, нужно вызвать функцию `setImage(from urlString: String)` и передать подходящую строку в качестве аргумента.
+///
+/// При использовании в коллекциях и таблицах, для корректной работы, нужно очищать содержимое объекта `AsyncImageView`.
+/// Для этого в методе жизненного цикла `func prepareForReuse()` на `UITableViewCell` или `UICollectionViewCell`,
+/// вызовите метод `.prepareForReuse()` у самого экземпляра `AsyncImageView`.
 public final class AsyncImageView: UIImageView {
     //MARK: - Private properties
     private let imageCache = ImageCache.shared
@@ -44,6 +52,14 @@ public final class AsyncImageView: UIImageView {
     }
     
     //MARK: - Public methods
+    
+    /// Запускает процесс загрузки изображения из сети.
+    /// - Parameter urlString: строка, содержащая подходящий URL-адрес
+    ///
+    /// Во время загрузи изображения `AsyncImageView` показывает индикатор загрузки.
+    /// При неудачном запросе, отобразится характерное изображение об ошибке.
+    ///
+    /// Если изображение по данной ссылке было загружено ранее, `AsyncImageView` загрузит его из локального кэша.
     public func setImage(from urlString: String) {
         switch URL(string: urlString) {
         case .none: image = failImage
@@ -54,6 +70,8 @@ public final class AsyncImageView: UIImageView {
         }
     }
     
+    /// Очищает содержимое `AsyncImageView` и прекращает загрузку текущего изображения.
+    /// При работе с коллекциями и таблицами, необходимо вовремя очищать `AsyncImageView` что бы не провоцировать непредсказуемое поведение объекта.
     public func prepareForReuse() {
         self.image = nil
         task?.cancel()
@@ -102,15 +120,15 @@ private extension AsyncImageView {
     }
     
     func processTaskResult(_ url: URL) -> (Result<Data, Error>) -> UIImage? {
-        { [self] result in
+        { result in
             switch result
-                .map(saveToCacheData(from: url))
+                .map(self.saveToCacheData(from: url))
                 .map(UIImage.init) {
             case .success(let image):
                 return image
                 
             case .failure:
-                return failImage
+                return self.failImage
             }
         }
     }
