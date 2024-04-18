@@ -11,12 +11,19 @@ let package = Package(
     ],
     products: [
         .library(name: "PlatziFakeStore", targets: ["PlatziFakeStore"]),
+        .library(name: "AsyncImageView", targets: ["AsyncImageView"])
     ],
     dependencies: [
         .package(url: "https://github.com/ShapovalovIlya/SwiftFP.git", branch: "main"),
 //        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
+        .target(
+            name: "AsyncImageView",
+            dependencies: [
+                .product(name: "SwiftFP", package: "SwiftFP")
+            ]
+        ),
         .target(
             name: "PlatziFakeStore",
             dependencies: [
