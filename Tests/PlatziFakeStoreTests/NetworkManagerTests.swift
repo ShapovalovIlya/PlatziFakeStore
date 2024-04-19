@@ -11,14 +11,18 @@ import XCTest
 final class NetworkManagerTests: XCTestCase {
     private var sut: NetworkManager!
     private var mockSession: URLSession!
+    private var mockRequest: URLRequest!
     
     override func setUp() async throws {
         try await super.setUp()
         
+        URLProtocol.registerClass(StubProtocol.self)
+        
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [StubProtocol.self]
-        mockSession = URLSession(configuration: config)
         
+        mockSession = URLSession(configuration: config)
+        mockRequest = URLRequest(url: URL(string: "baz")!)
         sut = NetworkManager(
             .init(session: mockSession)
         )
@@ -26,6 +30,8 @@ final class NetworkManagerTests: XCTestCase {
     
     override func tearDown() async throws {
         try await super.tearDown()
+        
+        URLProtocol.unregisterClass(StubProtocol.self)
         
         sut = nil
         mockSession = nil
@@ -38,7 +44,7 @@ final class NetworkManagerTests: XCTestCase {
             .init(loadResponse: { _ in (data, URLResponse()) })
         )
         
-        let result = await sut.perform(URLRequest(url: URL(string: "baz")!))
+        let result = await sut.perform(mockRequest)
         
         switch result {
         case .success(let success):
@@ -49,10 +55,59 @@ final class NetworkManagerTests: XCTestCase {
         }
     }
     
+    func test_managerStartLoading() async {
+        _ = await sut.perform(mockRequest)
+        
+        XCTAssertTrue(StubProtocol.didStartLoading)
+    }
+    
+    func test_managerRequestEndWithSuccess() async {
+        StubProtocol.responseHandler = { _ in .success("baz".data(using: .utf8)!) }
+        
+        let result = await sut.perform(mockRequest)
+        
+        switch result {
+        case .success(let success):
+            XCTAssertEqual(String(data: success.data, encoding: .utf8), "baz")
+            
+        case .failure(let failure):
+            XCTFail()
+        }
+    }
+    
+    func test_managerRequestEndWithError() async {
+        StubProtocol.responseHandler = { _ in .failure(URLError(.badURL)) }
+        
+        let result = await sut.perform(mockRequest)
+        
+        switch result {
+        case .success:
+            XCTFail()
+            
+        case .failure(let error):
+            XCTAssertTrue(error is URLError)
+        }
+    }
+    
+    func test_managerSaveSuccessResponse() async {
+        StubProtocol.responseHandler = { _ in .success("baz".data(using: .utf8)!) }
+        var isSaved = false
+        sut = .init(
+            .init(
+                session: mockSession,
+                saveResponse: { _,_ in isSaved = true }
+            )
+        )
+        
+        _ = await sut.perform(mockRequest)
+        
+        XCTAssertTrue(isSaved)
+    }
+    
 }
 
 private final class StubProtocol: URLProtocol {
-    static var responseHandler: ((URL) -> Result<NetworkManager.Response, Error>)?
+    static var responseHandler: ((URL) -> Result<Data, Error>) = { _ in .failure(URLError(.unknown)) }
     static var didStartLoading = false
     
     override func startLoading() {
@@ -65,13 +120,14 @@ private final class StubProtocol: URLProtocol {
     }
     
     private func redirectResult(
-        _ result: Result<NetworkManager.Response, Error>,
+        _ result: Result<Data, Error>,
         _ client: any URLProtocolClient
     ) {
+        client.urlProtocol(self, didReceive: HTTPURLResponse(), cacheStoragePolicy: .notAllowed)
+        
         switch result {
-        case let .success(success):
-            client.urlProtocol(self, didReceive: success.response, cacheStoragePolicy: .notAllowed)
-            client.urlProtocol(self, didLoad: success.data)
+        case let .success(data):
+            client.urlProtocol(self, didLoad: data)
             
         case let .failure(error):
             client.urlProtocol(self, didFailWithError: error)
@@ -79,7 +135,6 @@ private final class StubProtocol: URLProtocol {
     }
     
     override func stopLoading() { }
-//    override class func canInit(with task: URLSessionTask) -> Bool { true }
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 }
