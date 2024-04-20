@@ -7,14 +7,14 @@
 
 import Foundation
 
-public struct Endpoint {
+public struct Endpoint<API: ApiScheme> {
     //MARK: - Internal properties
-    @usableFromInline let path: String
-    @usableFromInline let queryItems: [URLQueryItem]
+    public let path: String
+    public let queryItems: [URLQueryItem]
     
     //MARK: - init(_:)
-    @usableFromInline
-    init(
+    @inlinable
+    public init(
         path: String = .init(),
         queryItems: [URLQueryItem] = .init()
     ) {
@@ -34,9 +34,9 @@ public struct Endpoint {
     //MARK: - Public methods
     public var url: URL {
         var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.escuelajs.co"
-        components.path = "/api/v1/".appending(path)
+        components.scheme = API.scheme
+        components.host = API.host
+        components.path = API.basePathComponent.appending(path)
         
         if !queryItems.isEmpty {
             components.queryItems = queryItems

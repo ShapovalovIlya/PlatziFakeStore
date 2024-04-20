@@ -61,7 +61,7 @@ public extension Request {
     }
     
     @inlinable
-    func headers(@HeadersBuilder build: () -> [Header]) -> Self {
+    func headers(@HeadersBuilder build: () -> [String : String]) -> Self {
         Request(method: method, url: url, body: body) {
             headers
             build()
@@ -75,8 +75,6 @@ public extension Request {
 }
 
 public extension Request {
-    typealias Header = (field: String, value: String)
-    
     enum HTTPMethod: String {
         case GET
         case POST

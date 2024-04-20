@@ -11,20 +11,23 @@ import Foundation
 public enum HeadersBuilder {
     
     @inlinable
-    public static func buildBlock(_ components: Request.Header...) -> [String: String] {
+    public static func buildBlock(_ components: Header...) -> [String: String] {
         components.reduce(into: [String: String]()) { $0[$1.field] = $1.value }
     }
     
     @inlinable
-    public static func buildBlock(_ components: [Request.Header]...) -> [String: String] {
-        components
-            .flatMap { $0 }
-            .reduce(into: [String: String]()) { $0[$1.field] = $1.value }
+    public static func buildBlock(_ components: [Header]...) -> [String: String] {
+        buildBlock(components.flatMap { $0 })
     }
     
     @inlinable
-    public static func buildExpression(_ expression: [Request.Header]) -> [String : String] {
-        expression.reduce(into: [String: String]()) { $0[$1.field] = $1.value }
+    public static func buildExpression(_ expression: [Header]) -> [String : String] {
+        buildBlock(expression)
+    }
+    
+    @inlinable
+    public static func buildExpression(_ expression: Header) -> [String : String] {
+        [expression.field: expression.value]
     }
     
     @inlinable

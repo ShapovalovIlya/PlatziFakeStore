@@ -27,6 +27,9 @@ final class RequestTests: XCTestCase {
         let sut = Request(url: mockUrl)
             .method(.GET)
             .body("bar".data(using: .utf8)!)
+            .headers {
+                Header(field: "ContentType", value: "json")
+            }
             .constructed
         
         XCTAssertEqual(sut.httpMethod, "GET")
