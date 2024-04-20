@@ -18,6 +18,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
+        .target(name: "Endpoints"),
+        .target(name: "Request"),
         .target(
             name: "AsyncImageView",
             dependencies: [
@@ -27,12 +29,12 @@ let package = Package(
         .target(
             name: "PlatziFakeStore",
             dependencies: [
+                "Request",
                 "Endpoints",
                 "NetworkManager",
                 .product(name: "SwiftFP", package: "SwiftFP")
             ]
         ),
-        .target(name: "Endpoints"),
         .target(
             name: "NetworkManager",
             dependencies: [
@@ -44,7 +46,8 @@ let package = Package(
             dependencies: [
                 "PlatziFakeStore",
                 "Endpoints",
-                "NetworkManager"
+                "NetworkManager",
+                "Request"
             ]
         ),
     ]

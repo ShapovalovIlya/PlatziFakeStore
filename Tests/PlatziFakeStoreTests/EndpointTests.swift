@@ -192,4 +192,12 @@ final class EndpointTests: XCTestCase {
             sut.url.absoluteString
         )
     }
+    
+    //MARK: - Mutation
+    
+    func test_flatMapped() {
+        let sut = Endpoint.categories.flatMap { _ in 1 }
+        
+        XCTAssertEqual(sut, 1)
+    }
 }

@@ -69,5 +69,10 @@ public extension Endpoint {
             builder()
         }
     }
+    
+    @inlinable
+    func flatMap<T>(_ transform: (URL) throws -> T) rethrows -> T {
+        try transform(url)
+    }
 }
 

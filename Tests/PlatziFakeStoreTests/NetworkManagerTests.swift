@@ -70,7 +70,7 @@ final class NetworkManagerTests: XCTestCase {
         case .success(let success):
             XCTAssertEqual(String(data: success.data, encoding: .utf8), "baz")
             
-        case .failure(let failure):
+        case .failure:
             XCTFail()
         }
     }
