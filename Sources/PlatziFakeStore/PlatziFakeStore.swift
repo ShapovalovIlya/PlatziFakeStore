@@ -67,7 +67,7 @@ public final class PlatziFakeStore {
     ///   - completion: Функция асинхронно возвращает результат запроса.
     ///   Либо созданный продукт, либо ошибку, возникшую в процессе запроса.
     public func create(
-        product: Product,
+        product: NewProduct,
         completion: @escaping (Result<Product, StoreError>) -> Void
     ) {
         guard let data = try? encoder.encode(product) else {
@@ -93,7 +93,7 @@ public final class PlatziFakeStore {
     ///   Либо обновленный продукт, либо ошибку, возникшую в процессе запроса.
     public func updateProduct(
         withId id: Int,
-        new product: Product,
+        new product: NewProduct,
         completion: @escaping (Result<Product, StoreError>) -> Void
     ) {
         guard let data = try? encoder.encode(product) else {
@@ -131,7 +131,7 @@ public final class PlatziFakeStore {
     
     /// Запрос возвращает список категорий
     /// - Parameters:
-    ///   - limit: Максимальное кол-во категорий в ответе
+    ///   - limit: Максимальное кол-во категорий в ответе. Значение `0` в этом поле убирает ограничение.
     ///   - completion: Функция асинхронно возвращает результат запроса.
     ///   Либо массив категорий, либо ошибку, возникшую в процессе запроса.
     public func categoryList(
@@ -144,6 +144,8 @@ public final class PlatziFakeStore {
             completion: completion
         )
     }
+    
+    
     
 }
 

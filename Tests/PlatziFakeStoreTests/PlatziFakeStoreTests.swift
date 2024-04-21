@@ -72,7 +72,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     func test_postProductSuccess() throws {
         let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
         
-        sut.create(product: mockProduct) { result in
+        sut.create(product: newProduct) { result in
             self.expectation.fulfill()
             switch result {
             case .success(let product): XCTAssertEqual(mockProduct, product)
@@ -86,7 +86,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     func test_postProductFailed() {
         let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
         
-        sut.create(product: mockProduct) { result in
+        sut.create(product: newProduct) { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()
@@ -100,7 +100,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     func test_updateProductWithIdSuccess() {
         let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
         
-        sut.updateProduct(withId: 0, new: mockProduct) { result in
+        sut.updateProduct(withId: 0, new: newProduct) { result in
             self.expectation.fulfill()
             switch result {
             case .success(let updated): XCTAssertEqual(mockProduct, updated)
@@ -114,7 +114,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     func test_updateProductWithIdFailed() {
         let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
         
-        sut.updateProduct(withId: 0, new: mockProduct) { result in
+        sut.updateProduct(withId: 0, new: newProduct) { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()
@@ -183,6 +183,8 @@ final class PlatziFakeStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    
 }
 
 private let mockProduct = Product(
@@ -192,6 +194,14 @@ private let mockProduct = Product(
     description: "baz",
     images: [],
     category: mockCategory
+)
+
+private let newProduct = NewProduct(
+    title: "baz",
+    price: 1,
+    description: "baz",
+    categoryId: 1,
+    images: []
 )
 
 private let mockCategory = Category(id: 1, name: "baz", image: "baz")
