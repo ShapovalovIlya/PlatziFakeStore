@@ -2,14 +2,19 @@ import XCTest
 @testable import PlatziFakeStore
 
 final class PlatziFakeStoreTests: XCTestCase {
-    private var response: URLResponse!
+    private let encoder = JSONEncoder()
+    
+    private var response: HTTPURLResponse!
     private var expectation: XCTestExpectation!
     private var productData: Data!
+    private var categoryData: Data!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         
-        productData = try JSONEncoder().encode(mockProduct)
+        productData = try encoder.encode(mockProduct)
+        categoryData = try encoder.encode(mockCategory)
+        
         response = HTTPURLResponse(
             url: URL(string: "baz")!,
             statusCode: 200,
@@ -21,7 +26,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     
     //MARK: - Product
     func test_getAllProductsSuccess() throws {
-        let data = try JSONEncoder().encode([mockProduct])
+        let data = try encoder.encode([mockProduct])
         
         let sut = PlatziFakeStore { _ in .success((data, self.response)) }
         
@@ -148,7 +153,36 @@ final class PlatziFakeStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    //MARK: - Category
+    func test_categoryListSuccess() throws {
+        let data = try encoder.encode([mockCategory])
+        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        
+        sut.categoryList(limit: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let categories): XCTAssertEqual(categories, [mockCategory])
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 
+    func test_categoryListFailure() throws {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        
+        sut.categoryList(limit: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockProduct = Product(

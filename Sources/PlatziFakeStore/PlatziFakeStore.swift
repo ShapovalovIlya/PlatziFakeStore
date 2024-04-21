@@ -25,7 +25,7 @@ public final class PlatziFakeStore {
         self.performRequest = performRequest
     }
     
-    //MARK: - Public methods
+    //MARK: - Product
     
     /// Асинхронно возвращает список продуктов.
     /// - Parameters:
@@ -123,6 +123,24 @@ public final class PlatziFakeStore {
         request(
             for: .product(withId: id),
             configure: { $0.method(.DELETE) },
+            completion: completion
+        )
+    }
+    
+    //MARK: - Category
+    
+    /// Запрос возвращает список категорий
+    /// - Parameters:
+    ///   - limit: Максимальное кол-во категорий в ответе
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо массив категорий, либо ошибку, возникшую в процессе запроса.
+    public func categoryList(
+        limit: Int = 20,
+        completion: @escaping (Result<[Category], StoreError>) -> Void
+    ) {
+        request(
+            for: .categoryList(limit: limit),
+            configure: { $0.method(.GET) },
             completion: completion
         )
     }
