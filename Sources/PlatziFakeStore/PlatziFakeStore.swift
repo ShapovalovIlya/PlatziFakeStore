@@ -211,6 +211,22 @@ public final class PlatziFakeStore {
         )
     }
     
+    /// Запрос на удаление категории с указанным идентификатором
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор категории
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо ответ на запрос удаления, либо ошибку, возникшую в процессе запроса.
+    public func deleteCategory(
+        withId id: Int,
+        completion: @escaping (Result<Bool, StoreError>) -> Void
+    ) {
+        request(
+            for: .category(withId: id),
+            configure: { $0.method(.DELETE) },
+            completion: completion
+        )
+    }
+    
 }
 
 private extension PlatziFakeStore {

@@ -267,6 +267,31 @@ final class PlatziFakeStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_deleteCategoryWithIdSuccess() throws {
+        let data = try encoder.encode(true)
+        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        
+        sut.deleteCategory(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let deleted): XCTAssertTrue(deleted)
+            case .failure: XCTFail()
+            }
+        }
+    }
+    
+    func test_deleteCategoryWithIdFailure() throws {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        
+        sut.deleteCategory(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+    }
 }
 
 private let mockProduct = Product(
