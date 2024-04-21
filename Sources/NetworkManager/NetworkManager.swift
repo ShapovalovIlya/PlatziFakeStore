@@ -32,7 +32,7 @@ public struct NetworkManager {
 
 private extension NetworkManager {
     func loadCacheIfAvailable(_ request: URLRequest) -> Either<URLRequest, Response> {
-        Either { loadResponse(request).map(Either.right) ?? Either.left(request) }
+        loadResponse(request).map(Either.right) ?? Either.left(request)
     }
     
     func loadData(for request: URLRequest) async -> Result<Response, Error> {
@@ -44,7 +44,9 @@ private extension NetworkManager {
     
     func saveDataToCache(for request: URLRequest) -> (Response) -> Response {
         { response in
-            self.saveResponse(response, request)
+            if request.httpMethod == "GET" {
+                self.saveResponse(response, request)
+            }
             return response
         }
     }
