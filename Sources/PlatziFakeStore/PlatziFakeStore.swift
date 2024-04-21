@@ -145,7 +145,29 @@ public final class PlatziFakeStore {
         )
     }
     
-    
+    /// Запрос на содание новой категории
+    /// - Parameters:
+    ///   - category: Экземпляр категории, которую вы хотите создать
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо новая категория, либо ошибка, возникшую в процессе запроса.
+    public func create(
+        category: NewCategory,
+        completion: @escaping (Result<Category, StoreError>) -> Void
+    ) {
+        guard let data = try? encoder.encode(category) else {
+            assertionFailure()
+            return
+        }
+        request(
+            for: .categories,
+            configure: { request in
+                request
+                    .method(.POST)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
     
 }
 

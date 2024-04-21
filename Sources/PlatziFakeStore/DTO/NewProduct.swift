@@ -8,7 +8,7 @@
 import Foundation
 
 /// Экземпляр предоставляет необходимую информацию для создания или обновления продукта
-/// в `API`
+/// в базе данных `Platzi Fake Store`
 public struct NewProduct: Encodable {
     public let title: String
     public let price: Int

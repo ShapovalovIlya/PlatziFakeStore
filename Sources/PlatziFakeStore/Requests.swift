@@ -13,6 +13,7 @@ extension Request {
     func contentHeader() -> Self {
         self.headers {
             Header(field: "Content-Type", value: "application/json")
+            Header(field: "accept:", value: "*/*")
         }
     }
     

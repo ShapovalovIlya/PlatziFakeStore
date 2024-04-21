@@ -9,7 +9,7 @@ import Foundation
 
 /// Экземпляр содержит данные о продукте, возвращаемые с сервера.
 ///
-/// Для создания  нового или обновления продукта, нужно использовать тип `NewProduct`
+/// Для создания  нового или обновления продукта, используйте тип `NewProduct`
 public struct Product: Codable, Equatable {
     public let id: Int
     public let title: String
