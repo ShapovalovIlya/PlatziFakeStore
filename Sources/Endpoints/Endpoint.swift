@@ -74,5 +74,10 @@ public extension Endpoint {
     func flatMap<T>(_ transform: (URL) throws -> T) rethrows -> T {
         try transform(url)
     }
+    
+    @inlinable
+    func flatMap(_ transform: (Endpoint) throws -> Endpoint) rethrows -> Endpoint {
+        try transform(self)
+    }
 }
 

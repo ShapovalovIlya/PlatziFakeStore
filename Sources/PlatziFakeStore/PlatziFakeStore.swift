@@ -140,8 +140,9 @@ private extension PlatziFakeStore {
     ) {
         Task { [weak self] in
             guard let self else { return }
-            let request = endpoint.flatMap(Request.create)
-            let result = await configure(request)
+            let result = await endpoint
+                .flatMap(Request.create)
+                .flatMap(configure)
                 .asyncFlatMap(performRequest)
                 .flatMap(unwrapResponse)
                 .decode(T.self, decoder: decoder)

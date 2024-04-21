@@ -79,6 +79,11 @@ public extension Request {
     }
     
     @inlinable
+    func flatMap(_ transform: (Request) throws -> Request) rethrows -> Self {
+        try transform(self)
+    }
+    
+    @inlinable
     func asyncFlatMap<T>(_ transform: (URLRequest) async throws -> T) async rethrows -> T {
         try await transform(constructed)
     }
