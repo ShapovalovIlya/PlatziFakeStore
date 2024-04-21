@@ -211,6 +211,34 @@ final class PlatziFakeStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_categoryWithIdSuccess() {
+        let sut = PlatziFakeStore { _ in .success((self.categoryData, self.response)) }
+        
+        sut.category(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let category): XCTAssertEqual(category, mockCategory)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_categoryWithIdFailure() {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        
+        sut.category(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockProduct = Product(

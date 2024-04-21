@@ -149,7 +149,7 @@ public final class PlatziFakeStore {
     /// - Parameters:
     ///   - category: Экземпляр категории, которую вы хотите создать
     ///   - completion: Функция асинхронно возвращает результат запроса.
-    ///   Либо новая категория, либо ошибка, возникшую в процессе запроса.
+    ///   Либо новая категория, либо ошибка, возникшая в процессе запроса.
     public func create(
         category: NewCategory,
         completion: @escaping (Result<Category, StoreError>) -> Void
@@ -169,6 +169,21 @@ public final class PlatziFakeStore {
         )
     }
     
+    /// Запрос возвращает категорию с указанным `id`
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор категории
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо искомая категория, либо ошибка, возникшая в процессе запроса.
+    public func category(
+        withId id: Int,
+        completion: @escaping (Result<Category, StoreError>) -> Void
+    ) {
+        request(
+            for: .category(withId: id),
+            configure: { $0.method(.GET) },
+            completion: completion
+        )
+    }
 }
 
 private extension PlatziFakeStore {
