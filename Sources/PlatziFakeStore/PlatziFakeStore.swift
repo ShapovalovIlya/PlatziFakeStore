@@ -40,7 +40,7 @@ public final class PlatziFakeStore {
     ) {
         request(
             for: .productList(offset: offset, limit: limit), 
-            configure: get(request:),
+            configure: { $0.method(.GET) },
             completion: completion
         )
     }
@@ -56,7 +56,7 @@ public final class PlatziFakeStore {
     ) {
         request(
             for: .product(withId: id),
-            configure: get(request:),
+            configure: { $0.method(.GET) },
             completion: completion
         )
     }
@@ -76,7 +76,53 @@ public final class PlatziFakeStore {
         }
         request(
             for: .products,
-            configure: postRequest(payload: data),
+            configure: { request in
+                request
+                    .method(.POST)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
+    
+    /// Запрос на обновление существующего продукта
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор продукта
+    ///   - product: Обновленная модель продукта
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо обновленный продукт, либо ошибку, возникшую в процессе запроса.
+    public func updateProduct(
+        withId id: Int,
+        new product: Product,
+        completion: @escaping (Result<Product, StoreError>) -> Void
+    ) {
+        guard let data = try? encoder.encode(product) else {
+            assertionFailure()
+            return
+        }
+        request(
+            for: .product(withId: id),
+            configure: { request in
+                request
+                    .method(.PUT)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
+    
+    /// Запрос на удаление продукта
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор продукта
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо ответ на запрос удаления, либо ошибку, возникшую в процессе запроса.
+    public func deleteProduct(
+        withId id: Int,
+        completion: @escaping (Result<Bool, StoreError>) -> Void
+    ) {
+        request(
+            for: .product(withId: id),
+            configure: { $0.method(.DELETE) },
             completion: completion
         )
     }
@@ -86,22 +132,6 @@ public final class PlatziFakeStore {
 private extension PlatziFakeStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) -> Request
-    
-    func get(request: Request) -> Request {
-        request
-            .method(.GET)
-    }
-    
-    func postRequest(payload: Data) -> ProcessRequest {
-        { request in
-            request
-                .method(.POST)
-                .body(payload)
-                .headers {
-                    Header(field: "Content-Type", value: "application/json")
-                }
-        }
-    }
     
     func request<T: Decodable>(
         for endpoint: PlatziEndpoint,

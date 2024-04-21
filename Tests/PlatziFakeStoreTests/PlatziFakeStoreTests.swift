@@ -19,6 +19,7 @@ final class PlatziFakeStoreTests: XCTestCase {
         expectation = XCTestExpectation()
     }
     
+    //MARK: - Product
     func test_getAllProductsSuccess() throws {
         let data = try JSONEncoder().encode([mockProduct])
         
@@ -77,10 +78,67 @@ final class PlatziFakeStoreTests: XCTestCase {
         wait(for: [expectation], timeout: 0.1)
     }
     
-    func test_postProductFailed() throws {
+    func test_postProductFailed() {
         let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
         
         sut.create(product: mockProduct) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_updateProductWithIdSuccess() {
+        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
+        
+        sut.updateProduct(withId: 0, new: mockProduct) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let updated): XCTAssertEqual(mockProduct, updated)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_updateProductWithIdFailed() {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        
+        sut.updateProduct(withId: 0, new: mockProduct) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_deleteProductWithIdSuccess() throws {
+        let data = try JSONEncoder().encode(true)
+        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        
+        sut.deleteProduct(withId: 0) { result in
+            self.expectation.fulfill()
+            switch result {
+            case let .success(deleted): XCTAssertTrue(deleted)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_deleteProductWithIdFailed() {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        
+        sut.deleteProduct(withId: 0) { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()

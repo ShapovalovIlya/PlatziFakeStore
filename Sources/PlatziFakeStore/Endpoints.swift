@@ -8,13 +8,14 @@
 import Foundation
 import Endpoints
 
-public struct Platzi: ApiScheme {
-    public static let scheme: String = "https"
-    public static var host: String = "api.escuelajs.co"
-    public static var basePathComponent: String = "/api/v1/"
+@usableFromInline
+struct Platzi: ApiScheme {
+    @usableFromInline static let scheme: String = "https"
+    @usableFromInline static var host: String = "api.escuelajs.co"
+    @usableFromInline static var basePathComponent: String = "/api/v1/"
 }
 
-public extension Endpoint where API == Platzi {
+extension Endpoint where API == Platzi {
     //MARK: - Pre constructed
     @inlinable func limit(_ l: Int) -> Self {
         self.queryItems {
@@ -30,6 +31,7 @@ public extension Endpoint where API == Platzi {
     }
     
     //MARK: - Products
+    @usableFromInline
     static let products = Self(path: "products")
     
     @inlinable
@@ -47,6 +49,7 @@ public extension Endpoint where API == Platzi {
     }
     
     //MARK: - Users
+    @usableFromInline
     static let users = Self(path: "users")
     static let userIsAvailable = Self.users.addPath("is-available")
     
@@ -72,6 +75,7 @@ public extension Endpoint where API == Platzi {
     static let refreshToken = Self.auth.addPath("refresh-token")
     
     //MARK: - Categories
+    @usableFromInline
     static let categories = Self(path: "categories")
     
     @inlinable
@@ -101,6 +105,7 @@ public extension Endpoint where API == Platzi {
     }
     
     //MARK: - Files
+    @usableFromInline
     static let files = Self(path: "files")
     
     static let upload = Self.files.addPath("upload")

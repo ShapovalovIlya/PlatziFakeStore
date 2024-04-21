@@ -6,7 +6,8 @@
 //
 
 import XCTest
-@testable import Endpoints
+import Endpoints
+@testable import PlatziFakeStore
 
 final class EndpointTests: XCTestCase {
     //MARK: - Products
