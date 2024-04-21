@@ -30,9 +30,9 @@ public final class PlatziFakeStore {
     /// Асинхронно возвращает список продуктов.
     /// - Parameters:
     ///   - limit: Максимальное количество продуктов, возвращаемых при вызове `API`
-    ///   - offset: Отступ исползуемый для постраничной загрузки данных
+    ///   - offset: Отступ используемый для постраничной загрузки данных
     ///   - completion: Функция асинхронно возвращает результат запроса.
-    ///   Либо таблицу продуктов, либо ошибку, возникшую в процессе запроса.
+    ///   Либо массив продуктов, либо ошибку, возникшую в процессе запроса.
     public func productList(
         limit: Int = 20,
         offset: Int = 0,
@@ -223,6 +223,26 @@ public final class PlatziFakeStore {
         request(
             for: .category(withId: id),
             configure: { $0.method(.DELETE) },
+            completion: completion
+        )
+    }
+    
+    /// Запрос на получение коллекции продуктов, для указанного идентификатора категории
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор категории
+    ///   - limit: Максимальное кол-во продуктов в ответе
+    ///   - offset: Отступ для постраничной загрузки
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо массив продуктов, либо ошибку, возникшую в процессе запроса.
+    public func productList(
+        categoryId id: Int,
+        limit: Int = 20,
+        offset: Int = 0,
+        completion: @escaping (Result<[Product], StoreError>) -> Void
+    ) {
+        request(
+            for: .productsFor(categoryId: id, limit: limit, offset: offset),
+            configure: { $0.method(.GET) },
             completion: completion
         )
     }
