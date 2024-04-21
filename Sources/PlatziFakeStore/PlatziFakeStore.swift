@@ -17,7 +17,7 @@ public final class PlatziFakeStore {
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
     private let performRequest: (URLRequest) async -> Result<Response, Error>
-
+    
     //MARK: - init(_:)
     init(
         performRequest: @escaping (URLRequest) async -> Result<Response, Error>
@@ -39,7 +39,7 @@ public final class PlatziFakeStore {
         completion: @escaping (Result<[Product], StoreError>) -> Void
     ) {
         request(
-            for: .productList(offset: offset, limit: limit), 
+            for: .productList(offset: offset, limit: limit),
             configure: { $0.method(.GET) },
             completion: completion
         )
@@ -184,6 +184,33 @@ public final class PlatziFakeStore {
             completion: completion
         )
     }
+    
+    /// Запрос на обновление категории с указанным идентификатором
+    /// - Parameters:
+    ///   - id: Уникальный иднтификатор категории
+    ///   - category: модель, содержащая изменения
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо обновленная категория, либо ошибка, возникшая в процессе запроса.
+    public func updateCategory(
+        withId id: Int,
+        new category: NewCategory,
+        completion: @escaping (Result<Category, StoreError>) -> Void
+    ) {
+        guard let data = try? encoder.encode(category) else {
+            assertionFailure()
+            return
+        }
+        request(
+            for: .category(withId: id),
+            configure: { request in
+                request
+                    .method(.PUT)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
+    
 }
 
 private extension PlatziFakeStore {
