@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct User: Decodable {
+public struct User: Codable {
     public let id: Int
     public let email: String
     public let password: String
@@ -17,7 +17,7 @@ public struct User: Decodable {
 }
 
 extension User {
-    public enum Role: String, Decodable {
+    public enum Role: String, Codable {
         case customer
         case admin
     }

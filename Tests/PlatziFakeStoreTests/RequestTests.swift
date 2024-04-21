@@ -28,13 +28,13 @@ final class RequestTests: XCTestCase {
             .method(.GET)
             .body("bar".data(using: .utf8)!)
             .headers {
-                Header(field: "ContentType", value: "json")
+                Header(field: "baz", value: "bar")
             }
             .constructed
         
         XCTAssertEqual(sut.httpMethod, "GET")
         XCTAssertEqual(sut.url?.absoluteString, "baz")
-        
+        XCTAssertEqual(sut.allHTTPHeaderFields?.contains(where: { $0.key == "baz" }), true)
         guard let body = sut.httpBody else {
             XCTFail()
             return

@@ -22,7 +22,7 @@ public struct Request {
     }
     
     //MARK: - init(_:)
-    @usableFromInline
+    @inlinable
     init(
         method: HTTPMethod = .GET,
         url: URL,
@@ -35,7 +35,7 @@ public struct Request {
         self.headers = headers
     }
     
-    @usableFromInline
+    @inlinable
     init(
         method: HTTPMethod = .GET,
         url: URL,
@@ -50,6 +50,11 @@ public struct Request {
 }
 
 public extension Request {
+    @inlinable
+    static func create(_ url: URL) -> Self {
+        Request(url: url)
+    }
+    
     @inlinable
     func method(_ m: HTTPMethod) -> Self {
         Request(method: m, url: url, body: body, headers: headers)
@@ -71,6 +76,11 @@ public extension Request {
     @inlinable
     func flatMap<T>(_ transform: (URLRequest) throws -> T) rethrows -> T {
         try transform(constructed)
+    }
+    
+    @inlinable
+    func asyncFlatMap<T>(_ transform: (URLRequest) async throws -> T) async rethrows -> T {
+        try await transform(constructed)
     }
 }
 

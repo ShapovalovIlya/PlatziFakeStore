@@ -8,8 +8,6 @@
 import Foundation
 import Endpoints
 
-public typealias PlatziEndpoint = Endpoint<Platzi>
-
 public struct Platzi: ApiScheme {
     public static let scheme: String = "https"
     public static var host: String = "api.escuelajs.co"
