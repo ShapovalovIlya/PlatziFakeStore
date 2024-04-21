@@ -7,8 +7,9 @@
 
 import Foundation
 
-public enum StoreError: Error {
+public enum StoreError: Error, Equatable {
     case unknown
+    case badRequest(String)
     case unauthorized
     
     init(_ error: Error) { self = .unknown }

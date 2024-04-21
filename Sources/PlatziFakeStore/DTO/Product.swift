@@ -12,6 +12,10 @@ public struct Product: Codable, Equatable {
     public let title: String
     public let price: Int
     public let description: String
+    
+    /// images must contain at least 1 elements,
+    /// images should not be empty,
+    /// each value in images must be a URL address,
     public let images: [String]
     public let category: Category
 }

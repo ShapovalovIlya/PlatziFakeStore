@@ -4,11 +4,18 @@ import XCTest
 final class PlatziFakeStoreTests: XCTestCase {
     private var response: URLResponse!
     private var expectation: XCTestExpectation!
+    private var productData: Data!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         
-        response = URLResponse()
+        productData = try JSONEncoder().encode(mockProduct)
+        response = HTTPURLResponse(
+            url: URL(string: "baz")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        )
         expectation = XCTestExpectation()
     }
     
@@ -20,11 +27,8 @@ final class PlatziFakeStoreTests: XCTestCase {
         sut.productList { result in
             self.expectation.fulfill()
             switch result {
-            case .success(let products):
-                XCTAssertEqual([mockProduct], products)
-                
-            case .failure:
-                XCTFail()
+            case .success(let products): XCTAssertEqual([mockProduct], products)
+            case .failure: XCTFail()
             }
         }
         
@@ -37,11 +41,8 @@ final class PlatziFakeStoreTests: XCTestCase {
         sut.productList { result in
             self.expectation.fulfill()
             switch result {
-            case .success:
-                XCTFail()
-                
-            case .failure(let error):
-                XCTAssertEqual(error, .unknown)
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
             }
         }
         
@@ -49,34 +50,41 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_getProductWithIdSuccess() throws {
-        let data = try JSONEncoder().encode(mockProduct)
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
         
         sut.product(withId: 1) { result in
             self.expectation.fulfill()
             switch result {
-            case .success(let product):
-                XCTAssertEqual(mockProduct, product)
-                
-            case .failure:
-                XCTFail()
+            case .success(let product): XCTAssertEqual(mockProduct, product)
+            case .failure: XCTFail()
             }
         }
         
         wait(for: [expectation], timeout: 0.1)
     }
     
-    func test_getProductWithIdFailed() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.badServerResponse)) }
+    func test_postProductSuccess() throws {
+        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
         
-        sut.productList { result in
+        sut.create(product: mockProduct) { result in
             self.expectation.fulfill()
             switch result {
-            case .success:
-                XCTFail()
-                
-            case .failure(let error):
-                XCTAssertEqual(error, .unauthorized)
+            case .success(let product): XCTAssertEqual(mockProduct, product)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_postProductFailed() throws {
+        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        
+        sut.create(product: mockProduct) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
             }
         }
         

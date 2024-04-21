@@ -13,7 +13,9 @@ import Request
 public final class PlatziFakeStore {
     typealias Response = (data: Data, response: URLResponse)
     
+    //MARK: - Private properties
     private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
     private let performRequest: (URLRequest) async -> Result<Response, Error>
 
     //MARK: - init(_:)
@@ -30,42 +32,86 @@ public final class PlatziFakeStore {
     ///   - limit: Максимальное количество продуктов, возвращаемых при вызове `API`
     ///   - offset: Отступ исползуемый для постраничной загрузки данных
     ///   - completion: Функция асинхронно возвращает результат запроса.
-    ///   Либо запрашиваемые данные, либо ошибку, возникшую в процессе запроса.
+    ///   Либо таблицу продуктов, либо ошибку, возникшую в процессе запроса.
     public func productList(
         limit: Int = 20,
         offset: Int = 0,
         completion: @escaping (Result<[Product], StoreError>) -> Void
     ) {
         request(
-            for: .productList(offset: offset, limit: limit),
+            for: .productList(offset: offset, limit: limit), 
+            configure: get(request:),
             completion: completion
         )
     }
     
-    /// <#Description#>
+    /// Асинхронно возвращает продукт по указаному `id`
     /// - Parameters:
-    ///   - id: <#id description#>
-    ///   - completion: <#completion description#>
+    ///   - id: Уникальный идентификатор продукта
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо искомый продукт, либо ошибку, возникшую в процессе запроса.
     public func product(
         withId id: Int,
         completion: @escaping (Result<Product, StoreError>) -> Void
     ) {
-        request(for: .product(withId: id), completion: completion)
+        request(
+            for: .product(withId: id),
+            configure: get(request:),
+            completion: completion
+        )
     }
+    
+    /// Запрос на создание нового продукта.
+    /// - Parameters:
+    ///   - product: экземпляр продукта, который вы хотите создать
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо созданный продукт, либо ошибку, возникшую в процессе запроса.
+    public func create(
+        product: Product,
+        completion: @escaping (Result<Product, StoreError>) -> Void
+    ) {
+        guard let data = try? encoder.encode(product) else {
+            assertionFailure()
+            return
+        }
+        request(
+            for: .products,
+            configure: postRequest(payload: data),
+            completion: completion
+        )
+    }
+    
 }
 
 private extension PlatziFakeStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
+    typealias ProcessRequest = (Request) -> Request
+    
+    func get(request: Request) -> Request {
+        request
+            .method(.GET)
+    }
+    
+    func postRequest(payload: Data) -> ProcessRequest {
+        { request in
+            request
+                .method(.POST)
+                .body(payload)
+                .headers {
+                    Header(field: "Content-Type", value: "application/json")
+                }
+        }
+    }
     
     func request<T: Decodable>(
         for endpoint: PlatziEndpoint,
+        configure: @escaping ProcessRequest,
         completion: @escaping (Result<T, StoreError>) -> Void
     ) {
         Task { [weak self] in
             guard let self else { return }
-            let result = await endpoint
-                .flatMap(Request.create)
-                .method(.GET)
+            let request = endpoint.flatMap(Request.create)
+            let result = await configure(request)
                 .asyncFlatMap(performRequest)
                 .flatMap(unwrapResponse)
                 .decode(T.self, decoder: decoder)
@@ -76,14 +122,42 @@ private extension PlatziFakeStore {
     }
     
     func unwrapResponse(_ response: Response) -> Result<Data, Error> {
-        
-        return .success(response.data)
+        Result {
+            guard let httpResponse = response.response as? HTTPURLResponse else {
+                throw StoreError.unknown
+            }
+            try checkStatusCode(
+                httpResponse.statusCode,
+                data: response.data
+            )
+            return response.data
+        }
+    }
+    
+    func checkStatusCode(_ statusCode: Int, data: Data) throws {
+        switch StatusCode(rawValue: statusCode) {
+        case .OK, .success: return
+            
+        case .badRequest:
+            guard let detail = String(data: data, encoding: .utf8) else {
+                assertionFailure()
+                return
+            }
+            throw StoreError.badRequest(detail)
+            
+        case .unauthorized: throw StoreError.unauthorized
+            
+        case .none: throw StoreError.unknown
+        }
     }
 }
 
 private extension PlatziFakeStore {
     enum StatusCode: Int {
-        case success = 200
+        case OK = 200
+        case success = 201
+        case badRequest = 400
+        case unauthorized = 401
     }
 }
 
