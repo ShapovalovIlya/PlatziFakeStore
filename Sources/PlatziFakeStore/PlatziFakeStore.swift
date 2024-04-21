@@ -4,7 +4,12 @@ import Endpoints
 import SwiftFP
 import Request
 
-/// <#Description#>
+/// Тип предназанчен для взаимодействия с `Platzi Fake Store API`.
+///
+/// Для получения данных, обратитесь к экземпляру `PlatziFakeStore.shared`.
+/// Он содержит в себе набор методов для взаимодействия.
+///
+/// Результат работы `PlatziFakeStore` может выполняться на background потоке.
 public final class PlatziFakeStore {
     typealias Response = (data: Data, response: URLResponse)
     
@@ -20,11 +25,12 @@ public final class PlatziFakeStore {
     
     //MARK: - Public methods
     
-    /// <#Description#>
+    /// Асинхронно возвращает список продуктов.
     /// - Parameters:
-    ///   - limit: <#limit description#>
-    ///   - offset: <#offset description#>
-    ///   - completion: <#completion description#>
+    ///   - limit: Максимальное количество продуктов, возвращаемых при вызове `API`
+    ///   - offset: Отступ исползуемый для постраничной загрузки данных
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо запрашиваемые данные, либо ошибку, возникшую в процессе запроса.
     public func productList(
         limit: Int = 20,
         offset: Int = 0,
