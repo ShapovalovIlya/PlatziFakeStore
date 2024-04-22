@@ -249,6 +249,7 @@ public final class PlatziFakeStore {
     
 }
 
+//MARK: - Private methods
 private extension PlatziFakeStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) -> Request

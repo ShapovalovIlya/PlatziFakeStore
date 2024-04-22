@@ -11,17 +11,19 @@ import SwiftFP
 public struct NetworkManager {
     public typealias Response = (data: Data, response: URLResponse)
     
+    //MARK: - Private properties
     private let session: URLSession
     private let saveResponse: (Response, URLRequest) -> Void
     private let loadResponse: (URLRequest) -> Response?
 
-    
+    //MARK: - init(_)
     public init(_ dependencies: Dependencies = .configured) {
         self.session = dependencies.session
         self.saveResponse = dependencies.saveResponse
         self.loadResponse = dependencies.loadResponse
     }
     
+    //MARK: - Public methods
     public func perform(_ request: URLRequest) async -> Result<Response, Error> {
         await loadCacheIfAvailable(request)
             .mapRight(Result.success)
