@@ -1,5 +1,4 @@
 {
-  "originHash" : "fc5a9a25f0e3d0cf8b00d805fcaf8bb089cb0c232ef4063ec99089152cea3913",
   "pins" : [
     {
       "identity" : "swift-docc-plugin",
@@ -25,9 +24,9 @@
       "location" : "https://github.com/ShapovalovIlya/SwiftFP.git",
       "state" : {
         "branch" : "main",
-        "revision" : "97f31e13d565be3b89dc88adbb262e7826195054"
+        "revision" : "cc781b2cd420f76222901d2aaf12fe210866bc36"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
