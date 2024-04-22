@@ -1,7 +1,7 @@
 import XCTest
 @testable import PlatziFakeStore
 
-final class PlatziFakeStoreTests: XCTestCase {
+final class PlatziStoreTests: XCTestCase {
     private let encoder = JSONEncoder()
     
     private var response: HTTPURLResponse!
@@ -323,7 +323,46 @@ final class PlatziFakeStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    //MARK: - Users
+    func test_userListSuccess() throws {
+        let data = try encoder.encode([mockUser])
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.userList(limit: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case let .success(users): XCTAssertEqual(users, [mockUser])
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_userListFailed() throws {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.userList(limit: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
+
+private let mockUser = User(
+    id: 1,
+    email: "baz",
+    password: "bar",
+    name: "foo",
+    role: .customer,
+    avatar: "baz"
+)
 
 private let mockProduct = Product(
     id: 1,

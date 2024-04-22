@@ -247,6 +247,23 @@ public final class PlatziStore {
         )
     }
     
+    //MARK: - Users
+    
+    /// Запрос на получение коллекции пользователей
+    /// - Parameters:
+    ///   - limit: Максимальное кол-во пользователей в ответе
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо массив пользователей, либо ошибку, возникшую в процессе запроса.
+    public func userList(
+        limit: Int = 20,
+        completion: @escaping (Result<[User], StoreError>) -> Void
+    ) {
+        request(
+            for: .users,
+            configure: { $0.method(.GET) },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
