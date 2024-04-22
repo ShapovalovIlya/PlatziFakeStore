@@ -6,11 +6,11 @@ import Request
 
 /// Тип предназанчен для взаимодействия с `Platzi Fake Store API`.
 ///
-/// Для получения данных, обратитесь к экземпляру `PlatziFakeStore.shared`.
+/// Для получения данных, обратитесь к экземпляру `PlatziStore.shared`.
 /// Он содержит в себе набор методов для взаимодействия.
 ///
-/// Результат работы `PlatziFakeStore` может выполняться на background потоке.
-public final class PlatziFakeStore {
+/// Результат работы `PlatziStore` может выполняться на background потоке.
+public final class PlatziStore {
     typealias Response = (data: Data, response: URLResponse)
     
     //MARK: - Private properties
@@ -250,7 +250,7 @@ public final class PlatziFakeStore {
 }
 
 //MARK: - Private methods
-private extension PlatziFakeStore {
+private extension PlatziStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) -> Request
     
@@ -304,7 +304,7 @@ private extension PlatziFakeStore {
     }
 }
 
-private extension PlatziFakeStore {
+private extension PlatziStore {
     enum StatusCode: Int {
         case OK = 200
         case success = 201
@@ -313,9 +313,9 @@ private extension PlatziFakeStore {
     }
 }
 
-public extension PlatziFakeStore {
+public extension PlatziStore {
     //MARK: - Shared instance
-    static let shared = PlatziFakeStore(
+    static let shared = PlatziStore(
         performRequest: NetworkManager().perform
     )
     

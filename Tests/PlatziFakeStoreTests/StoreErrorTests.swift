@@ -19,7 +19,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_unknownError() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -37,7 +37,7 @@ final class StoreErrorTests: XCTestCase {
     func test_statusCode_200_success() {
         response = makeRequest(statusCode: 200)
         let data = true.description.data(using: .utf8)!
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.deleteProduct(withId: 1) { result in
             self.expectation.fulfill()
@@ -53,7 +53,7 @@ final class StoreErrorTests: XCTestCase {
     func test_statusCode_201_success() {
         response = makeRequest(statusCode: 201)
         let data = true.description.data(using: .utf8)!
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.deleteProduct(withId: 1) { result in
             self.expectation.fulfill()
@@ -68,7 +68,7 @@ final class StoreErrorTests: XCTestCase {
     
     func test_badRequestError() {
         response = makeRequest(statusCode: 400)
-        let sut = PlatziFakeStore { _ in .success((Data(), self.response)) }
+        let sut = PlatziStore { _ in .success((Data(), self.response)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -83,7 +83,7 @@ final class StoreErrorTests: XCTestCase {
     
     func test_unauthorizedError() {
         response = makeRequest(statusCode: 401)
-        let sut = PlatziFakeStore { _ in .success((Data(), self.response)) }
+        let sut = PlatziStore { _ in .success((Data(), self.response)) }
         
         sut.productList { result in
             self.expectation.fulfill()

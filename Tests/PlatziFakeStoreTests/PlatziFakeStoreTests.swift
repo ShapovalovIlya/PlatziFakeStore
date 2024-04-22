@@ -28,7 +28,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     func test_getAllProductsSuccess() throws {
         let data = try encoder.encode([mockProduct])
         
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -42,7 +42,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_getAllProductsFailed() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -56,7 +56,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_getProductWithIdSuccess() throws {
-        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.productData, self.response)) }
         
         sut.product(withId: 1) { result in
             self.expectation.fulfill()
@@ -70,7 +70,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_postProductSuccess() throws {
-        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.productData, self.response)) }
         
         sut.create(product: newProduct) { result in
             self.expectation.fulfill()
@@ -84,7 +84,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_postProductFailed() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
         
         sut.create(product: newProduct) { result in
             self.expectation.fulfill()
@@ -98,7 +98,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateProductWithIdSuccess() {
-        let sut = PlatziFakeStore { _ in .success((self.productData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.productData, self.response)) }
         
         sut.updateProduct(withId: 0, new: newProduct) { result in
             self.expectation.fulfill()
@@ -112,7 +112,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateProductWithIdFailed() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
         
         sut.updateProduct(withId: 0, new: newProduct) { result in
             self.expectation.fulfill()
@@ -127,7 +127,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     
     func test_deleteProductWithIdSuccess() throws {
         let data = try JSONEncoder().encode(true)
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.deleteProduct(withId: 0) { result in
             self.expectation.fulfill()
@@ -141,7 +141,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_deleteProductWithIdFailed() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
         
         sut.deleteProduct(withId: 0) { result in
             self.expectation.fulfill()
@@ -157,7 +157,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     //MARK: - Category
     func test_categoryListSuccess() throws {
         let data = try encoder.encode([mockCategory])
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.categoryList(limit: 1) { result in
             self.expectation.fulfill()
@@ -171,7 +171,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
 
     func test_categoryListFailure() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.categoryList(limit: 1) { result in
             self.expectation.fulfill()
@@ -185,7 +185,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_createNewCategorySuccess() throws {
-        let sut = PlatziFakeStore { _ in .success((self.categoryData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.categoryData, self.response)) }
         
         sut.create(category: newCategory) { result in
             self.expectation.fulfill()
@@ -199,7 +199,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_createNewCategoryFailed() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.create(category: newCategory) { result in
             self.expectation.fulfill()
@@ -213,7 +213,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_categoryWithIdSuccess() {
-        let sut = PlatziFakeStore { _ in .success((self.categoryData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.categoryData, self.response)) }
         
         sut.category(withId: 1) { result in
             self.expectation.fulfill()
@@ -227,7 +227,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_categoryWithIdFailure() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.category(withId: 1) { result in
             self.expectation.fulfill()
@@ -241,7 +241,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateCategoryWithIdSuccess() {
-        let sut = PlatziFakeStore { _ in .success((self.categoryData, self.response)) }
+        let sut = PlatziStore { _ in .success((self.categoryData, self.response)) }
         
         sut.updateCategory(withId: 1, new: newCategory) { result in
             self.expectation.fulfill()
@@ -255,7 +255,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateCategoryWithIdFailed() {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.updateCategory(withId: 1, new: newCategory) { result in
             self.expectation.fulfill()
@@ -270,7 +270,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     
     func test_deleteCategoryWithIdSuccess() throws {
         let data = try encoder.encode(true)
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.deleteCategory(withId: 1) { result in
             self.expectation.fulfill()
@@ -282,7 +282,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_deleteCategoryWithIdFailure() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.deleteCategory(withId: 1) { result in
             self.expectation.fulfill()
@@ -297,7 +297,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     
     func test_productListForCategoryIdSuccess() throws {
         let data = try encoder.encode([mockProduct])
-        let sut = PlatziFakeStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((data, self.response)) }
         
         sut.productList(categoryId: 1) { result in
             self.expectation.fulfill()
@@ -311,7 +311,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_productListForCategoryIdFailed() throws {
-        let sut = PlatziFakeStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
         
         sut.productList(categoryId: 1) { result in
             self.expectation.fulfill()
