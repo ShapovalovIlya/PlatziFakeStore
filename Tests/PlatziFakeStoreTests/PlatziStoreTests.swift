@@ -8,12 +8,14 @@ final class PlatziStoreTests: XCTestCase {
     private var expectation: XCTestExpectation!
     private var productData: Data!
     private var categoryData: Data!
+    private var userData: Data!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
         
         productData = try encoder.encode(mockProduct)
         categoryData = try encoder.encode(mockCategory)
+        userData = try encoder.encode(mockUser)
         
         response = HTTPURLResponse(
             url: URL(string: "baz")!,
@@ -22,6 +24,16 @@ final class PlatziStoreTests: XCTestCase {
             headerFields: nil
         )
         expectation = XCTestExpectation()
+    }
+    
+    override func tearDownWithError() throws {
+        try super.tearDownWithError()
+        
+        productData = nil
+        categoryData = nil
+        userData = nil
+        response = nil
+        expectation = nil
     }
     
     //MARK: - Product
@@ -355,8 +367,7 @@ final class PlatziStoreTests: XCTestCase {
     }
     
     func test_createUserSuccess() throws {
-        let data = try encoder.encode(mockUser)
-        let sut = PlatziStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore { _ in .success((self.userData, self.response)) }
         
         sut.create(user: newUser) { result in
             self.expectation.fulfill()
@@ -373,6 +384,34 @@ final class PlatziStoreTests: XCTestCase {
         let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.create(user: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_userWithIdSuccess() {
+        let sut = PlatziStore { _ in .success((self.userData, self.response)) }
+        
+        sut.user(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let user): XCTAssertEqual(user, mockUser)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_userWithIdFailed() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.user(withId: 1) { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()

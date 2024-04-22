@@ -273,6 +273,22 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    /// Запрос на поиск пользователя по указанному идентификатору
+    /// - Parameters:
+    ///   - id: Уникальный идентификатор пользователя
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо искомый польватель, либо ошибка, возникшую в процессе запроса.
+    public func user(
+        withId id: Int,
+        completion: @escaping (Result<User, StoreError>) -> Void
+    ) {
+        request(
+            for: .user(withId: id),
+            configure: { $0.method(.GET) },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
