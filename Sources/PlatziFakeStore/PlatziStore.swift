@@ -70,14 +70,11 @@ public final class PlatziStore {
         product: NewProduct,
         completion: @escaping (Result<Product, StoreError>) -> Void
     ) {
-        guard let data = try? encoder.encode(product) else {
-            assertionFailure()
-            return
-        }
         request(
             for: .products,
             configure: { request in
-                request
+                let data = try self.encoder.encode(product)
+                return request
                     .method(.POST)
                     .addPayload(data)
             },
@@ -96,14 +93,11 @@ public final class PlatziStore {
         new product: NewProduct,
         completion: @escaping (Result<Product, StoreError>) -> Void
     ) {
-        guard let data = try? encoder.encode(product) else {
-            assertionFailure()
-            return
-        }
         request(
             for: .product(withId: id),
             configure: { request in
-                request
+                let data = try self.encoder.encode(product)
+                return request
                     .method(.PUT)
                     .addPayload(data)
             },
@@ -154,14 +148,11 @@ public final class PlatziStore {
         category: NewCategory,
         completion: @escaping (Result<Category, StoreError>) -> Void
     ) {
-        guard let data = try? encoder.encode(category) else {
-            assertionFailure()
-            return
-        }
         request(
             for: .categories,
             configure: { request in
-                request
+                let data = try self.encoder.encode(category)
+                return request
                     .method(.POST)
                     .addPayload(data)
             },
@@ -196,14 +187,11 @@ public final class PlatziStore {
         new category: NewCategory,
         completion: @escaping (Result<Category, StoreError>) -> Void
     ) {
-        guard let data = try? encoder.encode(category) else {
-            assertionFailure()
-            return
-        }
         request(
             for: .category(withId: id),
             configure: { request in
-                request
+                let data = try self.encoder.encode(category)
+                return request
                     .method(.PUT)
                     .addPayload(data)
             },
@@ -264,12 +252,33 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    /// Запрос на создание нового пользователя
+    /// - Parameters:
+    ///   - user: экземпляр пользователя, которого вы хотите добавить в базу
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо созданного пользователя, либо ошибку, возникшую в процессе запроса.
+    public func create(
+        user: NewUser,
+        completion: @escaping (Result<User, StoreError>) -> Void
+    ) {
+        request(
+            for: .users,
+            configure: { request in
+                let data = try self.encoder.encode(user)
+                return request
+                    .method(.POST)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
 private extension PlatziStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
-    typealias ProcessRequest = (Request) -> Request
+    typealias ProcessRequest = (Request) throws -> Request
     
     func request<T: Decodable>(
         for endpoint: PlatziEndpoint,
@@ -280,7 +289,8 @@ private extension PlatziStore {
             guard let self else { return }
             let result = await endpoint
                 .flatMap(Request.create)
-                .flatMap(configure)
+                .tryMap(configure)
+                .map(\.constructed)
                 .asyncFlatMap(performRequest)
                 .flatMap(unwrapResponse)
                 .decode(T.self, decoder: decoder)

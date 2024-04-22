@@ -12,13 +12,6 @@ public struct User: Codable, Equatable {
     public let email: String
     public let password: String
     public let name: String
-    public let role: Role
+    public let role: UserRole
     public let avatar: String
-}
-
-extension User {
-    public enum Role: String, Codable {
-        case customer
-        case admin
-    }
 }

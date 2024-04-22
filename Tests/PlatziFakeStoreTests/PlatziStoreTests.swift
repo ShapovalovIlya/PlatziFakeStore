@@ -353,6 +353,35 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_createUserSuccess() throws {
+        let data = try encoder.encode(mockUser)
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.create(user: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let user): XCTAssertEqual(user, mockUser)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_createUserFailed() throws {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.create(user: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockUser = User(
@@ -379,6 +408,14 @@ private let newProduct = NewProduct(
     description: "baz",
     categoryId: 1,
     images: []
+)
+
+private let newUser = NewUser(
+    email: "baz",
+    name: "foo",
+    password: "bar",
+    role: .customer,
+    avatar: "baz"
 )
 
 private let newCategory = NewCategory(name: "baz", image: "bar")
