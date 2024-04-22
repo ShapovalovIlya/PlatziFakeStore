@@ -12,6 +12,8 @@ final class StoreErrorTests: XCTestCase {
     private var response: HTTPURLResponse!
     private let expectation = XCTestExpectation()
     
+    
+    
     override func tearDownWithError() throws {
         try super.tearDownWithError()
         
@@ -19,7 +21,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_unknownError() {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -35,7 +37,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_statusCode_200_success() {
-        response = makeRequest(statusCode: 200)
+        response = makeResponse(statusCode: 200)
         let data = true.description.data(using: .utf8)!
         let sut = PlatziStore { _ in .success((data, self.response)) }
         
@@ -51,7 +53,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_statusCode_201_success() {
-        response = makeRequest(statusCode: 201)
+        response = makeResponse(statusCode: 201)
         let data = true.description.data(using: .utf8)!
         let sut = PlatziStore { _ in .success((data, self.response)) }
         
@@ -67,7 +69,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_badRequestError() {
-        response = makeRequest(statusCode: 400)
+        response = makeResponse(statusCode: 400)
         let sut = PlatziStore { _ in .success((Data(), self.response)) }
         
         sut.productList { result in
@@ -82,7 +84,7 @@ final class StoreErrorTests: XCTestCase {
     }
     
     func test_unauthorizedError() {
-        response = makeRequest(statusCode: 401)
+        response = makeResponse(statusCode: 401)
         let sut = PlatziStore { _ in .success((Data(), self.response)) }
         
         sut.productList { result in
@@ -96,11 +98,38 @@ final class StoreErrorTests: XCTestCase {
         wait(for: [expectation], timeout: 0.1)
     }
     
-//    func test_
+    func test_badUrl() {
+        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
+        
+        sut.productList { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .badURL(.none))
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_decodingError() {
+        response = makeResponse(statusCode: 200)
+        let sut = PlatziStore { _ in .success((Data(), self.response)) }
+        
+        sut.productList { result in
+            self.expectation.fulfill()
+            switch result {
+            case .failure(.decodeFail): XCTAssertTrue(true)
+            default: XCTFail()
+             }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private extension StoreErrorTests {
-    func makeRequest(statusCode: Int) -> HTTPURLResponse? {
+    func makeResponse(statusCode: Int) -> HTTPURLResponse? {
         HTTPURLResponse(
             url: URL(string: "baz")!,
             statusCode: statusCode,

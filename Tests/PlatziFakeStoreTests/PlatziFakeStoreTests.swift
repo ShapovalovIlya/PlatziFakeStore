@@ -42,7 +42,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_getAllProductsFailed() throws {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.productList { result in
             self.expectation.fulfill()
@@ -84,7 +84,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_postProductFailed() {
-        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.create(product: newProduct) { result in
             self.expectation.fulfill()
@@ -112,7 +112,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateProductWithIdFailed() {
-        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.updateProduct(withId: 0, new: newProduct) { result in
             self.expectation.fulfill()
@@ -141,7 +141,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_deleteProductWithIdFailed() {
-        let sut = PlatziStore { _ in .failure(URLError(.badURL)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.deleteProduct(withId: 0) { result in
             self.expectation.fulfill()
@@ -171,7 +171,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
 
     func test_categoryListFailure() throws {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.categoryList(limit: 1) { result in
             self.expectation.fulfill()
@@ -199,7 +199,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_createNewCategoryFailed() throws {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.create(category: newCategory) { result in
             self.expectation.fulfill()
@@ -227,7 +227,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_categoryWithIdFailure() {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.category(withId: 1) { result in
             self.expectation.fulfill()
@@ -255,7 +255,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_updateCategoryWithIdFailed() {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.updateCategory(withId: 1, new: newCategory) { result in
             self.expectation.fulfill()
@@ -282,7 +282,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_deleteCategoryWithIdFailure() throws {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.deleteCategory(withId: 1) { result in
             self.expectation.fulfill()
@@ -311,7 +311,7 @@ final class PlatziFakeStoreTests: XCTestCase {
     }
     
     func test_productListForCategoryIdFailed() throws {
-        let sut = PlatziStore { _ in .failure(URLError(.unknown)) }
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
         sut.productList(categoryId: 1) { result in
             self.expectation.fulfill()
