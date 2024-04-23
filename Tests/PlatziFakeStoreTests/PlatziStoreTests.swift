@@ -450,6 +450,34 @@ final class PlatziStoreTests: XCTestCase {
         wait(for: [expectation], timeout: 0.1)
     }
 
+    func test_deleteUserWithIdSuccess() throws {
+        let data = try encoder.encode(true)
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.deleteUser(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case let .success(deleted): XCTAssertTrue(deleted)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_deleteUserWithIdFail() throws {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.deleteUser(withId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockUser = User(

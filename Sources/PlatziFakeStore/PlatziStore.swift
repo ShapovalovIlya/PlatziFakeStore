@@ -312,6 +312,22 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    /// Запрос на удаление пользователя с указанным идентификатором
+    /// - Parameters:
+    ///   - id: уникальный идентификатор пользователя
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо результат запроса на удаление, либо ошибка, возникшая в процессе запроса.
+    public func deleteUser(
+        withId id: Int,
+        completion: @escaping (Result<Bool, StoreError>) -> Void
+    ) {
+        request(
+            for: .user(withId: id),
+            configure: { $0.method(.DELETE) },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
