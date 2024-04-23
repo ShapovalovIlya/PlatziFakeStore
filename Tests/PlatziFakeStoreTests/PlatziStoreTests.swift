@@ -421,6 +421,35 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_updateUserWithIdSuccess() {
+        let sut = PlatziStore { _ in .success((self.userData, self.response)) }
+        
+        sut.updateUser(withId: 1, new: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case let .success(user): XCTAssertEqual(user, mockUser)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_updateUserWithIdFail() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.updateUser(withId: 1, new: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+
 }
 
 private let mockUser = User(

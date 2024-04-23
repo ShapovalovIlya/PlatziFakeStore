@@ -289,6 +289,29 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    /// Запрос на обновление данных пользователя с указанным идентификатором
+    /// - Parameters:
+    ///   - id: уникальный идентификатор пользователя
+    ///   - new: модель, содержащая изменения
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Либо обновленный польватель, либо ошибка, возникшая в процессе запроса.
+    public func updateUser(
+        withId id: Int,
+        new: NewUser,
+        completion: @escaping (Result<User, StoreError>) -> Void
+    ) {
+        request(
+            for: .user(withId: id),
+            configure: { request in
+                let data = try self.encoder.encode(new)
+                return request
+                    .method(.PUT)
+                    .addPayload(data)
+            },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
