@@ -14,15 +14,22 @@ public final class PlatziStore {
     typealias Response = (data: Data, response: URLResponse)
     
     //MARK: - Private properties
-    private let decoder = JSONDecoder()
-    private let encoder = JSONEncoder()
+    private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
     private let performRequest: (URLRequest) async -> Result<Response, Error>
+    private let validateEmail: (String) throws -> Void
     
     //MARK: - init(_:)
     init(
-        performRequest: @escaping (URLRequest) async -> Result<Response, Error>
+        performRequest: @escaping (URLRequest) async -> Result<Response, Error>,
+        validateEmail: @escaping (String) throws -> Void = { _ in },
+        decoder: JSONDecoder = .platziDecoder,
+        encoder: JSONEncoder = JSONEncoder()
     ) {
         self.performRequest = performRequest
+        self.validateEmail = validateEmail
+        self.decoder = decoder
+        self.encoder = encoder
     }
     
     //MARK: - Product
@@ -328,12 +335,50 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    //MARK: - Login
+    public func login(
+        email: String,
+        password: String,
+        completion: @escaping (Result<Bool, StoreError>) -> Void
+    ) {
+        request(
+            for: .login,
+            configure: loginRequest(email: email, password: password),
+            completion: saveToken(completion)
+        )
+    }
 }
 
 //MARK: - Private methods
 private extension PlatziStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) throws -> Request
+    typealias TokenResponse = (Result<Tokens, StoreError>) -> Void
+    
+    func loginRequest(
+        email: String,
+        password: String
+    ) -> ProcessRequest {
+        { [self] request in
+            try validateEmail(email)
+            let data = try encoder.encode(Credentials(email: email, password: password))
+            return request
+                .method(.POST)
+                .addPayload(data)
+        }
+    }
+    
+    func saveToken(
+        _ completion: @escaping (Result<Bool, StoreError>) -> Void
+    ) -> (TokenResponse) {
+        { result in
+            completion(
+                result
+                    .map { _ in true }
+            )
+        }
+    }
     
     func request<T: Decodable>(
         for endpoint: PlatziEndpoint,

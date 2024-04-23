@@ -18,6 +18,12 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
+        .target(
+            name: "Validator",
+            dependencies: [
+                .product(name: "SwiftFP", package: "SwiftFP")
+            ]
+        ),
         .target(name: "Endpoints"),
         .target(name: "Request"),
         .target(
@@ -29,6 +35,7 @@ let package = Package(
         .target(
             name: "PlatziFakeStore",
             dependencies: [
+                "Validator",
                 "Request",
                 "Endpoints",
                 "NetworkManager",
@@ -47,7 +54,8 @@ let package = Package(
                 "PlatziFakeStore",
                 "Endpoints",
                 "NetworkManager",
-                "Request"
+                "Request",
+                "Validator"
             ]
         ),
     ]

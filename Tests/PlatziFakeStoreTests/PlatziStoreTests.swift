@@ -478,6 +478,37 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    //MARK: - Login
+    func test_loginSuccess() throws {
+        let mockTokens = Tokens(accessToken: "baz", refreshToken: "bar")
+        let data = try encoder.encode(mockTokens)
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.login(email: "baz", password: "bar") { result in
+            self.expectation.fulfill()
+            switch result {
+            case let .success(login): XCTAssertTrue(login)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_loginFail() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.login(email: "baz", password: "bar") { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockUser = User(
