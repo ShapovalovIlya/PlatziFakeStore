@@ -116,4 +116,24 @@ extension Endpoint where API == Platzi {
             .files
             .addPath(named)
     }
+    
+    //MARK: - Search
+    
+    @inlinable 
+    static func searchProducts(
+        named name: String? = nil,
+        categoryId: Int? = nil
+    ) -> Self {
+        Endpoint
+            .products
+            .addPath()
+            .queryItems {
+                if let name {
+                    URLQueryItem(name: "title", value: name)
+                }
+                if let categoryId {
+                    URLQueryItem(name: "categoryId", value: categoryId.description)
+                }
+            }
+    }
 }

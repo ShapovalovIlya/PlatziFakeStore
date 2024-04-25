@@ -55,7 +55,7 @@ public extension Endpoint {
     }
     
     @inlinable
-    func addPath(_ p: String) -> Self {
+    func addPath(_ p: String = .init()) -> Self {
         Endpoint(
             path: path.appending("/").appending(p),
             queryItems: queryItems

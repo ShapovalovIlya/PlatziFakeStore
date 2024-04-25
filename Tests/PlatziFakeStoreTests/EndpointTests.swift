@@ -201,4 +201,32 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(sut, 1)
     }
+    
+    //MARK: - Search
+    func test_searchProductByTitle() {
+        let sut = Endpoint.searchProducts(named: "baz")
+        
+        XCTAssertEqual(
+            "https://api.escuelajs.co/api/v1/products/?title=baz",
+            sut.url.absoluteString
+        )
+    }
+    
+    func test_searchProductByCategory() {
+        let sut = Endpoint.searchProducts(categoryId: 1)
+        
+        XCTAssertEqual(
+            "https://api.escuelajs.co/api/v1/products/?categoryId=1",
+            sut.url.absoluteString
+        )
+    }
+    
+    func test_searchProductByTitleAndCategoryId() {
+        let sut = Endpoint.searchProducts(named: "baz", categoryId: 1)
+        
+        XCTAssertEqual(
+            "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1",
+            sut.url.absoluteString
+        )
+    }
 }
