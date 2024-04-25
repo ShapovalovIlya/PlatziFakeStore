@@ -275,7 +275,10 @@ public final class PlatziStore {
     ) {
         request(
             for: .users,
-            configure: { request in
+            configure: { [self] request in
+                guard isEmailValid(user.email) else {
+                    throw StoreError.invalidEmail
+                }
                 let data = try self.encoder.encode(user)
                 return request
                     .method(.POST)
@@ -348,6 +351,8 @@ public final class PlatziStore {
     ///   - password: пароль пользователя
     ///   - completion: Функция асинхронно возвращает результат запроса.
     ///   `true` если авторизация прошла успешно, либо ошибка, возникшая в процессе запроса.
+    ///
+    ///   `PlatziStore` валидирует почтовый адрес перед запросом.
     public func login(
         email: String,
         password: String,
@@ -365,23 +370,15 @@ public final class PlatziStore {
     ///   - email: `email` пользователя, активный профиль которого нужно запросить
     ///   - completion: Функция асинхронно возвращает результат запроса.
     ///   Профиль пользователя, либо ошибка, возникшая в процессе запроса.
+    ///
+    ///   `PlatziStore` валидирует почтовый адрес перед запросом.
     public func profile(
         withEmail email: String,
         completion: @escaping (Result<User, StoreError>) -> Void
     ) {
         request(
             for: .profile,
-            configure: { [self] request in
-                guard isEmailValid(email) else {
-                    throw StoreError.invalidEmail
-                }
-                guard let token = loadTokenForEmail(email) else {
-                    throw StoreError.unknown
-                }
-                return request
-                    .method(.GET)
-                    .addBearer(token)
-            },
+            configure: profileRequest(email),
             completion: completion
         )
     }
@@ -415,6 +412,20 @@ private extension PlatziStore {
     typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) throws -> Request
     typealias TokenResponse = (Result<Tokens, StoreError>) -> Void
+    
+    func profileRequest(_ email: String) -> ProcessRequest {
+        { [self] request in
+            guard isEmailValid(email) else {
+                throw StoreError.invalidEmail
+            }
+            guard let token = loadTokenForEmail(email) else {
+                throw StoreError.unknown
+            }
+            return request
+                .method(.GET)
+                .addBearer(token)
+        }
+    }
     
     func loginRequest(
         email: String,

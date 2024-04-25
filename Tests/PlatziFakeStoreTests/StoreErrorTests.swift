@@ -126,6 +126,22 @@ final class StoreErrorTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_createUserWithInvalidEmail() {
+        let sut = PlatziStore(
+            performRequest: { _ in preconditionFailure() },
+            isEmailValid: { _ in false }
+        )
+        let newUser = NewUser(email: "baz", name: "bar", password: "foo", role: .admin, avatar: "baz")
+        
+        sut.create(user: newUser) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .invalidEmail)
+            }
+        }
+    }
 }
 
 private extension StoreErrorTests {

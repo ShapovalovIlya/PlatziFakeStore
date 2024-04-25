@@ -367,7 +367,10 @@ final class PlatziStoreTests: XCTestCase {
     }
     
     func test_createUserSuccess() throws {
-        let sut = PlatziStore { _ in .success((self.userData, self.response)) }
+        let sut = PlatziStore(
+            performRequest: { _ in .success((self.userData, self.response)) },
+            isEmailValid: { _ in true }
+        )
         
         sut.create(user: newUser) { result in
             self.expectation.fulfill()
@@ -381,7 +384,10 @@ final class PlatziStoreTests: XCTestCase {
     }
     
     func test_createUserFailed() throws {
-        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        let sut = PlatziStore(
+            performRequest: { _ in .failure(CocoaError(.featureUnsupported)) },
+            isEmailValid: { _ in true }
+        )
         
         sut.create(user: newUser) { result in
             self.expectation.fulfill()
@@ -488,7 +494,7 @@ final class PlatziStoreTests: XCTestCase {
             isEmailValid: { _ in true } 
         )
         
-        sut.login(email: "baz", password: "bar") { result in
+        sut.login(email: "baz@bare.foo", password: "bar") { result in
             self.expectation.fulfill()
             switch result {
             case let .success(login): XCTAssertTrue(login)
@@ -505,7 +511,7 @@ final class PlatziStoreTests: XCTestCase {
             isEmailValid: { _ in true }
         )
         
-        sut.login(email: "baz", password: "bar") { result in
+        sut.login(email: "baz@bare.foo", password: "bar") { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()
@@ -523,7 +529,7 @@ final class PlatziStoreTests: XCTestCase {
             loadTokenForEmail: { _ in "" }
         )
         
-        sut.profile(withEmail: "baz") { result in
+        sut.profile(withEmail: "baz@bare.foo") { result in
             self.expectation.fulfill()
             switch result {
             case .success(let user): XCTAssertEqual(user, mockUser)
@@ -644,7 +650,7 @@ final class PlatziStoreTests: XCTestCase {
 
 private let mockUser = User(
     id: 1,
-    email: "baz",
+    email: "baz@bare.foo",
     password: "bar",
     name: "foo",
     role: .customer,
@@ -669,7 +675,7 @@ private let newProduct = NewProduct(
 )
 
 private let newUser = NewUser(
-    email: "baz",
+    email: "baz@bare.foo",
     name: "foo",
     password: "bar",
     role: .customer,
