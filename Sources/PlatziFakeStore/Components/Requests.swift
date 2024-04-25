@@ -22,4 +22,11 @@ extension Request {
         self.body(data)
             .contentHeader()
     }
+    
+    @inlinable
+    func addBearer(_ token: String) -> Self {
+        self.headers {
+            Header(field: "Authorization", value: "Bearer ".appending(token))
+        }
+    }
 }

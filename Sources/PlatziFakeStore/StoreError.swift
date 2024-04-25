@@ -34,6 +34,8 @@ public enum StoreError: Error, Equatable {
     /// Обычно, данная ошибка означает проблему на стороне библиотеки.
     case decodeFail(String)
     
+    case invalidEmail
+    
     //MARK: - init(_:)
     init(_ error: Error) {
         switch error {

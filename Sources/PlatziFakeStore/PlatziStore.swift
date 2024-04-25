@@ -16,20 +16,24 @@ public final class PlatziStore {
     //MARK: - Private properties
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    
     private let performRequest: (URLRequest) async -> Result<Response, Error>
-    private let validateEmail: (String) throws -> Void
+    private let isEmailValid: (String) -> Bool
+    private let loadTokenForEmail: (String) -> String?
     
     //MARK: - init(_:)
     init(
-        performRequest: @escaping (URLRequest) async -> Result<Response, Error>,
-        validateEmail: @escaping (String) throws -> Void = { _ in },
         decoder: JSONDecoder = .platziDecoder,
-        encoder: JSONEncoder = JSONEncoder()
+        encoder: JSONEncoder = JSONEncoder(),
+        performRequest: @escaping (URLRequest) async -> Result<Response, Error>,
+        isEmailValid: @escaping (String) -> Bool = { _ in preconditionFailure() },
+        loadTokenForEmail: @escaping (String) -> String? = { _ in preconditionFailure() }
     ) {
-        self.performRequest = performRequest
-        self.validateEmail = validateEmail
         self.decoder = decoder
         self.encoder = encoder
+        self.performRequest = performRequest
+        self.isEmailValid = isEmailValid
+        self.loadTokenForEmail = loadTokenForEmail
     }
     
     //MARK: - Product
@@ -337,6 +341,13 @@ public final class PlatziStore {
     }
     
     //MARK: - Login
+    
+    /// Запрос на авторизацию по email и паролю
+    /// - Parameters:
+    ///   - email: почтовый адрес пользователя
+    ///   - password: пароль пользователя
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   `true` если авторизация прошла успешно, либо ошибка, возникшая в процессе запроса.
     public func login(
         email: String,
         password: String,
@@ -346,6 +357,32 @@ public final class PlatziStore {
             for: .login,
             configure: loginRequest(email: email, password: password),
             completion: saveToken(completion)
+        )
+    }
+    
+    /// Запрос возвращает профиль пользователя с активной сессией, по указанному `email`
+    /// - Parameters:
+    ///   - email: `email` пользователя, активный профиль которого нужно запросить
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Профиль пользователя, либо ошибка, возникшая в процессе запроса.
+    public func profile(
+        withEmail email: String,
+        completion: @escaping (Result<User, StoreError>) -> Void
+    ) {
+        request(
+            for: .profile,
+            configure: { [self] request in
+                guard isEmailValid(email) else {
+                    throw StoreError.invalidEmail
+                }
+                guard let token = loadTokenForEmail(email) else {
+                    throw StoreError.unknown
+                }
+                return request
+                    .method(.GET)
+                    .addBearer(token)
+            },
+            completion: completion
         )
     }
 }
@@ -361,7 +398,9 @@ private extension PlatziStore {
         password: String
     ) -> ProcessRequest {
         { [self] request in
-            try validateEmail(email)
+            guard isEmailValid(email) else {
+                throw StoreError.invalidEmail
+            }
             let data = try encoder.encode(Credentials(email: email, password: password))
             return request
                 .method(.POST)

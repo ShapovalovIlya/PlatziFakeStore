@@ -483,7 +483,10 @@ final class PlatziStoreTests: XCTestCase {
     func test_loginSuccess() throws {
         let mockTokens = Tokens(accessToken: "baz", refreshToken: "bar")
         let data = try encoder.encode(mockTokens)
-        let sut = PlatziStore { _ in .success((data, self.response)) }
+        let sut = PlatziStore(
+            performRequest: { _ in .success((data, self.response)) },
+            isEmailValid: { _ in true } 
+        )
         
         sut.login(email: "baz", password: "bar") { result in
             self.expectation.fulfill()
@@ -497,13 +500,34 @@ final class PlatziStoreTests: XCTestCase {
     }
     
     func test_loginFail() {
-        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        let sut = PlatziStore(
+            performRequest: { _ in .failure(CocoaError(.featureUnsupported)) },
+            isEmailValid: { _ in true }
+        )
         
         sut.login(email: "baz", password: "bar") { result in
             self.expectation.fulfill()
             switch result {
             case .success: XCTFail()
             case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_profileSuccess() {
+        let sut = PlatziStore(
+            performRequest: { _ in .success((self.userData, self.response)) },
+            isEmailValid: { _ in true },
+            loadTokenForEmail: { _ in "" }
+        )
+        
+        sut.profile(withEmail: "baz") { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let user): XCTAssertEqual(user, mockUser)
+            case .failure: XCTFail()
             }
         }
         
