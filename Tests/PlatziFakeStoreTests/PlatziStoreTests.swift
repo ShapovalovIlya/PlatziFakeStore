@@ -533,6 +533,113 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func test_profileFailure() {
+        let sut = PlatziStore(
+            performRequest: { _ in .failure(CocoaError(.featureUnsupported)) },
+            isEmailValid: { _ in true },
+            loadTokenForEmail: { _ in "" }
+        )
+        
+        sut.profile(withEmail: "baz") { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    //MARK: - Search
+    
+    func test_searchProductByTitleSuccess() throws {
+        let data = try encoder.encode([mockProduct])
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.searchProduct(named: "baz") { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let products): XCTAssertEqual(products, [mockProduct])
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_searchProductByTitleFail() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.searchProduct(named: "baz") { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_searchProductByCategoryIdSuccess() throws {
+        let data = try encoder.encode([mockProduct])
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.searchProduct(categoryId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let products): XCTAssertEqual(products, [mockProduct])
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_searchProductByCategoryIdFail() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.searchProduct(categoryId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_searchProductByNameAndCategoryIdSuccess() throws {
+        let data = try encoder.encode([mockProduct])
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.searchProduct(named: "baz", categoryId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let products): XCTAssertEqual(products, [mockProduct])
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_searchProductByNameAndCategoryIdFail() {
+        let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
+        
+        sut.searchProduct(named: "baz", categoryId: 1) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockUser = User(

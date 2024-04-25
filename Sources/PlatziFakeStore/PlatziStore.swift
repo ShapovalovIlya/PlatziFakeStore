@@ -385,6 +385,29 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    //MARK: - Search
+    
+    /// Запрос на поиск продуктов. Поддерживает фильтры.
+    /// - Parameters:
+    ///   - name: Название продукта, по которому будет отфильтрованы объекты
+    ///   - categoryId: Уникальный идентификатор категории, в рамках которой будет осуществляться поиск
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Коллекция продуктов, удовлетворяющая условиям поиска, либо ошибка, возникшая в процессе запроса.
+    ///
+    ///   Для поискового запроса предусмотрены 2 фильтра: по названию и по идентификатору категории.
+    ///   Оба фильтра не являются обязательными, но для работы запроса, нужно заполнить хотя бы один из них.
+    public func searchProduct(
+        named name: String? = nil,
+        categoryId: Int? = nil,
+        completion: @escaping (Result<[Product], StoreError>) -> Void
+    ) {
+        request(
+            for: .searchProducts(named: name, categoryId: categoryId),
+            configure: { $0.method(.GET) },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods
