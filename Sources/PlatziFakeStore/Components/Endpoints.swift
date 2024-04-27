@@ -15,6 +15,13 @@ struct Platzi: ApiScheme {
     @usableFromInline static var basePathComponent: String = "/api/v1/"
 }
 
+public enum SearchOption {
+    case title(String)
+    case categoryId(Int)
+    case priceMin(Int)
+    case priceMax(Int)
+}
+
 extension Endpoint where API == Platzi {
     //MARK: - Pre constructed
     @inlinable func limit(_ l: Int) -> Self {
@@ -119,21 +126,38 @@ extension Endpoint where API == Platzi {
     
     //MARK: - Search
     
-    @inlinable 
-    static func searchProducts(
-        named name: String? = nil,
-        categoryId: Int? = nil
-    ) -> Self {
+    @inlinable
+    static func searchProducts(_ options: [SearchOption]) -> Self {
         Endpoint
             .products
             .addPath()
             .queryItems {
-                if let name {
-                    URLQueryItem(name: "title", value: name)
-                }
-                if let categoryId {
-                    URLQueryItem(name: "categoryId", value: categoryId.description)
+                ForEachItem(options) { option in
+                    switch option {
+                    case let .title(title):
+                        URLQueryItem(name: "title", value: title)
+                        
+                    case let .categoryId(id):
+                        URLQueryItem(name: "categoryId", value: id.description)
+                        
+                    case let .priceMin(min):
+                        URLQueryItem(name: "price_min", value: min.description)
+                        
+                    case let .priceMax(max):
+                        URLQueryItem(name: "price_max", value: max.description)
+                    }
                 }
             }
+    }
+}
+
+@usableFromInline
+@QueryItemBuilder
+func ForEachItem<T>(
+    _ data: [T],
+    buildQuery: @escaping (T) -> URLQueryItem
+) -> [URLQueryItem] {
+    for element in data {
+        buildQuery(element)
     }
 }

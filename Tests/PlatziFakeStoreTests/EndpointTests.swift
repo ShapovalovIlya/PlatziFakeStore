@@ -203,30 +203,46 @@ final class EndpointTests: XCTestCase {
     }
     
     //MARK: - Search
-    func test_searchProductByTitle() {
-        let sut = Endpoint.searchProducts(named: "baz")
+    func test_searchProduct() {
+        var sut = Endpoint.searchProducts([.title("baz")])
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz",
             sut.url.absoluteString
         )
-    }
-    
-    func test_searchProductByCategory() {
-        let sut = Endpoint.searchProducts(categoryId: 1)
         
-        XCTAssertEqual(
-            "https://api.escuelajs.co/api/v1/products/?categoryId=1",
-            sut.url.absoluteString
-        )
-    }
-    
-    func test_searchProductByTitleAndCategoryId() {
-        let sut = Endpoint.searchProducts(named: "baz", categoryId: 1)
+        sut = Endpoint.searchProducts([
+            .title("baz"),
+            .categoryId(1)
+        ])
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1",
             sut.url.absoluteString
         )
+        
+        sut = Endpoint.searchProducts([
+            .title("baz"),
+            .categoryId(1),
+            .priceMin(0)
+        ])
+        
+        XCTAssertEqual(
+            "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1&price_min=0",
+            sut.url.absoluteString
+        )
+        
+        sut = Endpoint.searchProducts([
+            .title("baz"),
+            .categoryId(1),
+            .priceMin(0),
+            .priceMax(1)
+        ])
+        
+        XCTAssertEqual(
+            "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1&price_min=0&price_max=1",
+            sut.url.absoluteString
+        )
+
     }
 }
