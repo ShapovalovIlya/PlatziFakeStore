@@ -61,7 +61,9 @@ public final class AsyncImageView: UIImageView {
     ///
     /// Если изображение по данной ссылке было загружено ранее, `AsyncImageView` загрузит его из локального кэша.
     public func setImage(from urlString: String) {
-        switch URL(string: urlString) {
+        switch Box(urlString)
+            .map(prepareUrl)
+            .value {
         case .none: image = failImage
             
         case .some(let url):
@@ -86,6 +88,16 @@ public final class AsyncImageView: UIImageView {
 
 private extension AsyncImageView {
     //MARK: - Private methods
+    func prepareUrl(_ urlString: String) -> URL? {
+        urlString
+            .data(using: .utf8)
+            .flatMap { try? JSONSerialization.jsonObject(with: $0) }
+            .flatMap { $0 as? [String] }
+            .flatMap(\.first)
+            .flatMap(URL.init(string:))
+        ?? URL(string: urlString)
+    }
+    
     func showLoader() {
         loader.startAnimating()
         UIView.animate(withDuration: 0.3) {
