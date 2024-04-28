@@ -5,6 +5,8 @@ import SwiftFP
 import Request
 import Validator
 
+@_exported import enum Endpoints.SearchOption
+
 /// Тип предназаначен для взаимодействия с `Platzi Fake Store API`.
 ///
 /// Для получения данных, обратитесь к экземпляру `PlatziStore.shared`.
