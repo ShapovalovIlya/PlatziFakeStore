@@ -24,8 +24,18 @@ let package = Package(
                 .product(name: "SwiftFP", package: "SwiftFP")
             ]
         ),
-        .target(name: "Endpoints"),
-        .target(name: "Request"),
+        .target(
+            name: "Endpoints",
+            dependencies: [
+                .product(name: "SwiftFP", package: "SwiftFP")
+            ]
+        ),
+        .target(
+            name: "Request",
+            dependencies: [
+                .product(name: "SwiftFP", package: "SwiftFP")
+            ]
+        ),
         .target(
             name: "AsyncImageView",
             dependencies: [

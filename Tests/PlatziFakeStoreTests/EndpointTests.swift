@@ -15,7 +15,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.products
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/products"
         )
     }
@@ -24,7 +24,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.productList()
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/products?limit=20&offset=0"
         )
     }
@@ -33,7 +33,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.productList(offset: 1, limit: 10)
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/products?limit=10&offset=1"
         )
     }
@@ -42,7 +42,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.product(withId: 1)
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/products/1"
         )
     }
@@ -52,7 +52,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.users
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/users"
         )
     }
@@ -61,7 +61,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.userList()
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/users?limit=20"
         )
     }
@@ -70,7 +70,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.userList(limit: 1)
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/users?limit=1"
         )
     }
@@ -78,14 +78,17 @@ final class EndpointTests: XCTestCase {
     func test_userWithId() {
         let sut = Endpoint.user(withId: 1)
         
-        XCTAssertEqual(sut.url.absoluteString, "https://api.escuelajs.co/api/v1/users/1")
+        XCTAssertEqual(
+            sut.url.value.absoluteString,
+            "https://api.escuelajs.co/api/v1/users/1"
+        )
     }
     
     func test_userIsAvailable() {
         let sut = Endpoint.userIsAvailable
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/users/is-available"
         )
     }
@@ -96,7 +99,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.login
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/auth/login"
         )
     }
@@ -105,7 +108,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.profile
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/auth/profile"
         )
     }
@@ -114,7 +117,7 @@ final class EndpointTests: XCTestCase {
         let sut = Endpoint.refreshToken
         
         XCTAssertEqual(
-            sut.url.absoluteString,
+            sut.url.value.absoluteString,
             "https://api.escuelajs.co/api/v1/auth/refresh-token"
         )
     }
@@ -125,7 +128,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -134,7 +137,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories?limit=20",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -143,7 +146,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories?limit=1",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -152,7 +155,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories/1",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -161,7 +164,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories/1/products?limit=20&offset=0",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -170,7 +173,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/categories/1/products?limit=1&offset=1",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -181,7 +184,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/files/upload",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
     }
     
@@ -190,16 +193,8 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/files/baz",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
-    }
-    
-    //MARK: - Mutation
-    
-    func test_flatMapped() {
-        let sut = Endpoint.categories.flatMap { _ in 1 }
-        
-        XCTAssertEqual(sut, 1)
     }
     
     //MARK: - Search
@@ -208,7 +203,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
         
         sut = Endpoint.searchProducts([
@@ -218,7 +213,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
         
         sut = Endpoint.searchProducts([
@@ -229,7 +224,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1&price_min=0",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
         
         sut = Endpoint.searchProducts([
@@ -241,7 +236,7 @@ final class EndpointTests: XCTestCase {
         
         XCTAssertEqual(
             "https://api.escuelajs.co/api/v1/products/?title=baz&categoryId=1&price_min=0&price_max=1",
-            sut.url.absoluteString
+            sut.url.value.absoluteString
         )
 
     }

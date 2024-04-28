@@ -405,7 +405,6 @@ public final class PlatziStore {
 
 //MARK: - Private methods
 private extension PlatziStore {
-    typealias PlatziEndpoint = Endpoint<Platzi>
     typealias ProcessRequest = (Request) throws -> Request
     typealias TokenResponse = (Result<Tokens, StoreError>) -> Void
     
@@ -450,14 +449,16 @@ private extension PlatziStore {
     }
     
     func request<T: Decodable>(
-        for endpoint: PlatziEndpoint,
+        for endpoint: Endpoint,
         configure: @escaping ProcessRequest,
         completion: @escaping (Result<T, StoreError>) -> Void
     ) {
         Task { [weak self] in
             guard let self else { return }
             let result = await endpoint
-                .flatMap(Request.create)
+                .url
+                .map(Request.create)
+                .value
                 .tryMap(configure)
                 .map(\.constructed)
                 .asyncFlatMap(performRequest)
