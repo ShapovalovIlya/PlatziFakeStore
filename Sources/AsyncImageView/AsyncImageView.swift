@@ -63,6 +63,7 @@ public final class AsyncImageView: UIImageView {
     public func setImage(from urlString: String) {
         switch Box(urlString)
             .map(prepareUrl)
+            .map(URL.init(string:))
             .value {
         case .none: image = failImage
             
@@ -88,14 +89,13 @@ public final class AsyncImageView: UIImageView {
 
 private extension AsyncImageView {
     //MARK: - Private methods
-    func prepareUrl(_ urlString: String) -> URL? {
+    func prepareUrl(_ urlString: String) -> String {
         urlString
             .data(using: .utf8)
             .flatMap { try? JSONSerialization.jsonObject(with: $0) }
             .flatMap { $0 as? [String] }
             .flatMap(\.first)
-            .flatMap(URL.init(string:))
-        ?? URL(string: urlString)
+        ?? urlString
     }
     
     func showLoader() {
