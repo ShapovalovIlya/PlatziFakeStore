@@ -8,7 +8,7 @@
 import Foundation
 import SwiftFP
 
-enum Validator {
+public enum Validator {
     
     /// Проверяет валидность  указанного почтового адреса
     /// - Parameter email: адрес для проверки
@@ -19,7 +19,7 @@ enum Validator {
     ///  - адрес не должен начинаться или заканчиваться на `@`
     ///  - после символа `@`, адрес должен содержать знак `.`
     ///  - между `@` и знаком `.` должно быть не меньше 4 символов
-    static func isValid(email: String) -> Bool {
+    public static func isValid(email: String) -> Bool {
         email
             .lastIndex(of: "@")
             .flatMap { $0 != email.startIndex ? $0 : nil }

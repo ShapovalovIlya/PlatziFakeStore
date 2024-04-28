@@ -3,6 +3,7 @@ import NetworkManager
 import Endpoints
 import SwiftFP
 import Request
+import Validator
 
 /// Тип предназанчен для взаимодействия с `Platzi Fake Store API`.
 ///
@@ -473,10 +474,7 @@ private extension PlatziStore {
             guard let httpResponse = response.response as? HTTPURLResponse else {
                 throw StoreError.unknown
             }
-            try checkStatusCode(
-                httpResponse.statusCode,
-                data: response.data
-            )
+            try checkStatusCode(httpResponse.statusCode, data: response.data)
             return response.data
         }
     }
@@ -511,7 +509,8 @@ private extension PlatziStore {
 public extension PlatziStore {
     //MARK: - Shared instance
     static let shared = PlatziStore(
-        performRequest: NetworkManager().perform
+        performRequest: NetworkManager().perform,
+        isEmailValid: Validator.isValid
     )
     
 }
