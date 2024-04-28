@@ -135,16 +135,16 @@ extension Endpoint where API == Platzi {
                 ForEachItem(options) { option in
                     switch option {
                     case let .title(title):
-                        URLQueryItem(name: "title", value: title)
+                        return URLQueryItem(name: "title", value: title)
                         
                     case let .categoryId(id):
-                        URLQueryItem(name: "categoryId", value: id.description)
+                        return URLQueryItem(name: "categoryId", value: id.description)
                         
                     case let .priceMin(min):
-                        URLQueryItem(name: "price_min", value: min.description)
+                        return URLQueryItem(name: "price_min", value: min.description)
                         
                     case let .priceMax(max):
-                        URLQueryItem(name: "price_max", value: max.description)
+                        return URLQueryItem(name: "price_max", value: max.description)
                     }
                 }
             }
