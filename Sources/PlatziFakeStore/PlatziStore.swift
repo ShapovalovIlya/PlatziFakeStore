@@ -457,10 +457,9 @@ private extension PlatziStore {
             guard let self else { return }
             let result = await endpoint
                 .url
-                .map(Request.create)
-                .value
+                .flatMap(Request.new)
                 .tryMap(configure)
-                .map(\.constructed)
+                .map(\.value)
                 .asyncFlatMap(performRequest)
                 .flatMap(unwrapResponse)
                 .decode(T.self, decoder: decoder)

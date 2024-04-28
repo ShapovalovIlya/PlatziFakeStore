@@ -14,32 +14,32 @@ let package = Package(
         .library(name: "AsyncImageView", targets: ["AsyncImageView"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ShapovalovIlya/SwiftFP.git", branch: "main"),
+        Dependencies.SwiftFP.package,
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
         .target(
             name: "Validator",
             dependencies: [
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .target(
             name: "Endpoints",
             dependencies: [
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .target(
             name: "Request",
             dependencies: [
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .target(
             name: "AsyncImageView",
             dependencies: [
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .target(
@@ -49,13 +49,13 @@ let package = Package(
                 "Request",
                 "Endpoints",
                 "NetworkManager",
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .target(
             name: "NetworkManager",
             dependencies: [
-                .product(name: "SwiftFP", package: "SwiftFP")
+                Dependencies.SwiftFP.product
             ]
         ),
         .testTarget(
@@ -70,3 +70,19 @@ let package = Package(
         ),
     ]
 )
+
+fileprivate enum Dependencies {
+    case SwiftFP
+    
+    var package: Package.Dependency {
+        switch self {
+        case .SwiftFP: return .package(url: "https://github.com/ShapovalovIlya/SwiftFP.git", branch: "main")
+        }
+    }
+    
+    var product: Target.Dependency {
+        switch self {
+        case .SwiftFP: return .product(name: "SwiftFP", package: "SwiftFP")
+        }
+    }
+}

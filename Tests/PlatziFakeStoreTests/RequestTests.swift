@@ -24,13 +24,13 @@ final class RequestTests: XCTestCase {
     }
     
     func test_constructedRequest() {
-        let sut = Request(url: mockUrl)
+        let sut = Request.new(mockUrl)
             .method(.GET)
             .body("bar".data(using: .utf8)!)
             .headers {
                 Header(field: "baz", value: "bar")
             }
-            .constructed
+            .value
         
         XCTAssertEqual(sut.httpMethod, "GET")
         XCTAssertEqual(sut.url?.absoluteString, "baz")

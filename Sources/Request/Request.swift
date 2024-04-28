@@ -6,76 +6,62 @@
 //
 
 import Foundation
+import SwiftFP
 
-public struct Request {
-    @usableFromInline let method: HTTPMethod
-    @usableFromInline let url: URL
-    @usableFromInline let headers: [String: String]
-    @usableFromInline let body: Data?
-    
-    public var constructed: URLRequest {
-        var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
-        request.httpBody = body
-        headers.forEach { request.addValue($1, forHTTPHeaderField: $0) }
-        return request
-    }
-    
-    //MARK: - init(_:)
-    @inlinable
-    init(
-        method: HTTPMethod = .GET,
-        url: URL,
-        body: Data? = nil,
-        headers: [String : String] = .init()
-    ) {
-        self.method = method
-        self.url = url
-        self.body = body
-        self.headers = headers
-    }
-    
-    @inlinable
-    init(
-        method: HTTPMethod = .GET,
-        url: URL,
-        body: Data? = nil,
-        @HeadersBuilder build: () -> [String : String]
-    ) {
-        self.method = method
-        self.url = url
-        self.body = body
-        self.headers = build()
-    }
-}
+public typealias Request = Box<URLRequest>
 
 public extension Request {
-    @inlinable
-    static func create(_ url: URL) -> Self {
-        Request(url: url)
+    
+    @inlinable static func new(_ url: URL) -> Self {
+        Self(URLRequest(url: url))
     }
     
-    @inlinable
-    func method(_ m: HTTPMethod) -> Self {
-        Request(method: m, url: url, body: body, headers: headers)
+    @inlinable func method(_ m: HTTPMethod) -> Self {
+        self.map { old in
+            var new = old
+            new.httpMethod = m.rawValue
+            return new
+        }
     }
     
-    @inlinable
-    func body(_ d: Data) -> Self {
-        Request(method: method, url: url, body: d, headers: headers)
+    @inlinable func body(_ d: Data) -> Self {
+        self.map { old in
+            var new = old
+            new.httpBody = d
+            return new
+        }
     }
     
     @inlinable
     func headers(@HeadersBuilder build: () -> [String : String]) -> Self {
-        Request(method: method, url: url, body: body) {
-            headers
-            build()
+        self.map { old in
+            var new = old
+            build().forEach { new.addValue($1, forHTTPHeaderField: $0) }
+            return new
         }
     }
     
     @inlinable
     func tryMap(_ transform: (Request) throws -> Request) -> Result<Request, Error> {
         Result { try transform(self) }
+    }
+    
+    @inlinable func contentHeader() -> Self {
+        self.headers {
+            Header(field: "Content-Type", value: "application/json")
+            Header(field: "accept:", value: "*/*")
+        }
+    }
+    
+    @inlinable func addPayload(_ data: Data) -> Self {
+        self.body(data)
+            .contentHeader()
+    }
+    
+    @inlinable func addBearer(_ token: String) -> Self {
+        self.headers {
+            Header(field: "Authorization", value: "Bearer ".appending(token))
+        }
     }
 }
 
