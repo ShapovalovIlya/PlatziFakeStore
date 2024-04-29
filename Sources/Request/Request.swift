@@ -70,9 +70,7 @@ public extension Request {
             Header(field: "Authorization", value: "Bearer ".appending(token))
         }
     }
-}
-
-public extension Request {
+    
     enum HTTPMethod: String {
         case GET
         case POST

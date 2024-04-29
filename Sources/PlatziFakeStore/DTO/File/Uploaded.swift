@@ -7,6 +7,12 @@
 
 import Foundation
 
+/// Структура описывает результат сохранения файла в хранилище апи.
+///
+/// Содержит в себе деталищацию:
+///  - оригинальное название
+///  - название файла
+///  - URL адрес файла
 public struct Uploaded: Codable, Equatable {
     public let originalname: String
     public let filename: String
