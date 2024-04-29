@@ -403,6 +403,29 @@ public final class PlatziStore {
             completion: completion
         )
     }
+    
+    //MARK: - Files
+    
+    /// Запрос на загрузку файла в хранилище `API`
+    /// - Parameters:
+    ///   - data: Данные для сохранения
+    ///   - completion: Функция асинхронно возвращает результат запроса.
+    ///   Модель с информацией о сохраненном файле или ошибка, возникшая в процессе запроса.
+    public func upload(
+        _ data: Data,
+        completion: @escaping (Result<Uploaded, StoreError>) -> Void
+    ) {
+        request(
+            for: .upload,
+            configure: { [encoder] request in
+                let payload = try encoder.encode(Upload(file: data))
+                return request
+                    .method(.POST)
+                    .uploadFile(payload)
+            },
+            completion: completion
+        )
+    }
 }
 
 //MARK: - Private methods

@@ -58,6 +58,13 @@ public extension Request {
             .contentHeader()
     }
     
+    @inlinable func uploadFile(_ data: Data) -> Self {
+        self.body(data)
+            .headers {
+                Header(field: "Content-Type", value: "multipart/form-data")
+            }
+    }
+    
     @inlinable func addBearer(_ token: String) -> Self {
         self.headers {
             Header(field: "Authorization", value: "Bearer ".appending(token))

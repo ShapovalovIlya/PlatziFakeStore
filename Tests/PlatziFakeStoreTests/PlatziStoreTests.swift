@@ -599,6 +599,36 @@ final class PlatziStoreTests: XCTestCase {
         wait(for: [expectation], timeout: 0.1)
     }
     
+    //MARK: - Files
+    func test_uploadFileSuccess() throws {
+        let uploaded = Uploaded(originalname: "baz", filename: "bar", location: "foo")
+        let data = try encoder.encode(uploaded)
+        let sut = PlatziStore { _ in .success((data, self.response)) }
+        
+        sut.upload(Data()) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success(let model): XCTAssertEqual(model, uploaded)
+            case .failure: XCTFail()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
+    
+    func test_uploadFileFail() throws {
+        let sut = PlatziStore { _ in .failure(CocoaError(.fileNoSuchFile)) }
+        
+        sut.upload(Data()) { result in
+            self.expectation.fulfill()
+            switch result {
+            case .success: XCTFail()
+            case .failure(let error): XCTAssertEqual(error, .unknown)
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private let mockUser = User(
