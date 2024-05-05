@@ -181,7 +181,7 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
-
+    
     func test_categoryListFailure() throws {
         let sut = PlatziStore { _ in .failure(CocoaError(.featureUnsupported)) }
         
@@ -455,7 +455,7 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
-
+    
     func test_deleteUserWithIdSuccess() throws {
         let data = try encoder.encode(true)
         let sut = PlatziStore { _ in .success((data, self.response)) }
@@ -491,7 +491,7 @@ final class PlatziStoreTests: XCTestCase {
         let data = try encoder.encode(mockTokens)
         let sut = PlatziStore(
             performRequest: { _ in .success((data, self.response)) },
-            isEmailValid: { _ in true } 
+            isEmailValid: { _ in true }
         )
         
         sut.login(email: "baz@bare.foo", password: "bar") { result in
@@ -629,6 +629,7 @@ final class PlatziStoreTests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+
 }
 
 private let mockUser = User(

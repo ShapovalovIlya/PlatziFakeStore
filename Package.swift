@@ -14,8 +14,7 @@ let package = Package(
         .library(name: "AsyncImageView", targets: ["AsyncImageView"])
     ],
     dependencies: [
-        Dependencies.SwiftFP.package,
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+        Dependencies.SwiftFP.package
     ],
     targets: [
         .target(
