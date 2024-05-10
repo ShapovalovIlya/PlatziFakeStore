@@ -8,7 +8,7 @@
 import Foundation
 import SwiftFP
 
-public typealias Request = Box<URLRequest>
+public typealias Request = Monad<URLRequest>
 
 public extension Request {
     

@@ -27,7 +27,7 @@ public struct NetworkManager {
     public func perform(_ request: URLRequest) async -> Result<Response, Error> {
         await loadCacheIfAvailable(request)
             .mapRight(Result.success)
-            .asyncMap(loadData(for:))
+            .map(loadData(for:))
             .unwrap
     }
 }
@@ -40,7 +40,7 @@ private extension NetworkManager {
     func loadData(for request: URLRequest) async -> Result<Response, Error> {
         await Result
             .success(request)
-            .asyncMap(session.data)
+            .asyncTryMap(session.data)
             .map(saveDataToCache(for: request))
     }
     

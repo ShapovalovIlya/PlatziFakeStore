@@ -114,7 +114,7 @@ private final class StubProtocol: URLProtocol {
         Self.didStartLoading = true
         request.url
             .apply(Self.responseHandler)
-            .merge(client)
+            .zip(client)
             .map(redirectResult)
         client?.urlProtocolDidFinishLoading(self)
     }

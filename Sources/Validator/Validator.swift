@@ -25,7 +25,7 @@ public enum Validator {
             .flatMap { $0 != email.startIndex ? $0 : nil }
             .flatMap { $0 != email.indices.last ? $0 : nil }
             .flatMap { "." != email.last ? $0 : nil }
-            .merge(email.lastIndex(of: "."))
+            .zip(email.lastIndex(of: "."))
             .flatMap { $1 > $0  ? ($0, $1) : nil }
             .map(email.distance)
             .flatMap { $0 > 3 ? true : nil }

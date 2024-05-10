@@ -8,13 +8,13 @@
 import Foundation
 import SwiftFP
 
-public typealias Endpoint = Box<URLComponents>
+public typealias Endpoint = Monad<URLComponents>
 
 public extension Endpoint {
     static let new = Self(URLComponents())
     
     @inlinable
-    var url: Box<URL> {
+    var url: Monad<URL> {
         self.map { components in
             guard let url = components.url else {
                 preconditionFailure("Unable to create url from: \(components)")
